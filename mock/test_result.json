@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "summary": "Devin proposed the edit; Codex verified actual GnuCOBOL execution, source rates, copybook parity, invoice rounding and all 3,000 fixture records.",
+  "author_tool": "Devin CLI",
+  "validated_by": "Codex orchestrator",
+  "commit": "620f933cce11de09984ea9e673505addbecd1444",
+  "base_commit": "f6c27338e01a382f29f476f7bde623b88b3eab1c",
+  "diff_sha256": "3ae78ec9e2eff58ec42ce5b63752779f3a4b92ccbf2103e20e51cd9e0103dee4",
+  "effective_date": "2027-04-01",
+  "effective_date_enforced": false,
+  "held": true,
+  "tested_at": "2026-09-18T09:47:52.755146+00:00",
+  "test_output": "PASS: 8 rates, copybook parity, 5 invoice checks (GnuCOBOL), 3000 customers / 1214 category 7\n",
+  "run_output": "Engine: GnuCOBOL; invoices: 3000\nCategory 1: 9297758 yen tax\nCategory 2: 9277381 yen tax\nCategory 3: 9224129 yen tax\nCategory 4: 9170875 yen tax\nCategory 5: 9189224 yen tax\nCategory 6: 9207570 yen tax\nCategory 7: 54282813 yen tax\nCategory 8: 9225918 yen tax\n"
+}

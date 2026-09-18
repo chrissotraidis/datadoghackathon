@@ -1,0 +1,99 @@
+# Hanko · The stamp for agents
+
+A local hackathon demonstration: request a legacy billing change, compute its
+impact, inspect a proposed COBOL diff, call its named owner, and keep the spoken
+decision with the exact diff. Conditional approval creates a visible open task
+and keeps the change held. Nothing is merged or deployed by the app.
+
+## Run
+
+From this directory:
+
+```sh
+cp -n web/config.example.js web/config.js
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+Open http://127.0.0.1:8000/web/ in Chrome or Brave. Use **Use demo request** →
+**Analyze request** → **Call the owner**. `1` fills the demo; `R` resets simulated
+records when focus is outside a text field. Live decisions and locks survive
+Reset demo. Print opens a separate printable ledger with transcript and diff.
+
+No npm, bundler, framework, or application backend. Modules load static files.
+Only browser voice mode dynamically loads the ElevenLabs SDK from esm.sh, with
+jsDelivr as a fallback. Phone and canned modes do not load that dependency.
+
+## Configuration
+
+`web/config.js` defines `window.HANKO` and is gitignored. The local demo key is
+private, expires after one day, has ElevenAgents-only access and a 10,000-credit
+cap. Use a replacement key when it expires; never publish this config or serve
+this checkout on a public interface. This static hackathon app makes requests
+from the browser, so the key is readable by anyone using that local page.
+
+| Field | Purpose |
+| --- | --- |
+| `elevenKey` | ElevenLabs API key for outbound calls and conversation results |
+| `agentId` | Hanko caller agent ID |
+| `phoneNumberId` | Imported Twilio number ID from ElevenLabs, not Twilio SID |
+| `ownerPhone` | Your test mobile in E.164 format, such as `+1…` |
+| `geminiKey` | Optional Google Gemini key; empty uses deterministic summary |
+| `demoMode` | `canned`, `phone`, or `browser` |
+
+- **canned:** a four-second simulated conversation. No network or microphone.
+  The UI and print view explicitly mark it simulated, not human sign-off.
+- **phone:** calls the configured owner via ElevenLabs/Twilio, polls conversation
+  analysis, and stores the real transcript and decision. Requires all four
+  ElevenLabs/phone settings. Policy allows calls 09:00–20:00 JST only.
+- **browser:** uses your microphone with the same ElevenLabs agent. Conversation
+  analysis still needs the API key; without it, the transcript remains held and
+  no approval is inferred. Use localhost or HTTPS for microphone and Web Locks.
+
+The configured agent uses six dynamic variables and three analysis fields:
+`decision`, `condition_text`, `rationale_quote`. It reads conditions back for
+confirmation and ends the conversation. Only exact recognized decisions count;
+missing/ambiguous results remain held. No automated retries or backup calls are
+implemented. A live attempt consumes the local one-call lock even if it fails.
+
+## What is real
+
+- Deterministic source/paragraph/reference analysis of the synthetic fixture:
+  CALC-TAX, three jobs, 1,214 of 3,000 fictional customer records, 2009-04-01.
+- Original and proposed programs compile and execute using installed GnuCOBOL.
+  Without `cobc`, the runner explicitly labels Decimal arithmetic simulated.
+- Devin CLI produced the proposed category-7 rate edit on `chg-0417`. Codex ran
+  and verified the tests and committed it because the noninteractive Devin
+  permission mode declined its test/commit shell calls.
+- The proposal diff is exported from that unmerged branch. `test_result.json`
+  includes commit IDs, full diff hash and actual validation output.
+- The ledger snapshots the displayed diff and full SHA-256 before the call.
+  It stores the transcript, exact condition, rationale, owner, time and channel.
+
+## Demonstration boundaries
+
+The only approvable request is category 7, 8% → 10%, effective 2027-04-01.
+Other/defaulted requests may show impact but cannot approve the fixed proposal.
+The COBOL fixture has no effective-date guard. Every decision remains held for
+release, including an unconditional approval. The app does not apply, merge,
+delete, or deploy the proposal.
+
+Ledger storage and call locks are local to this browser and origin. They are not
+tamper-proof, cross-device authorization, identity verification, or an audit
+compliance guarantee. A diff hash identifies content; it is not a signature.
+No recorded voice is treated as biometric authentication. The optional Gemini
+summary can fall back to a template and does not determine the impact or policy.
+
+`PLAN.md` is a local copy of the original planning page, ignored because it
+contains account and contact details. Public documentation uses this README.
+
+## Validation
+
+```sh
+python3 mock/tests/test_rates.py
+python3 mock/run.py
+```
+
+Open `/web/test-impact.html` for the 48-check impact suite and
+`/web/test-call.html` for a canned call/duplicate-lock check. The latter's
+**Run in configured mode** button initiates a real call when phone mode is set;
+do not use it accidentally. See `VALIDATION.md` for current acceptance evidence.

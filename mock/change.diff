@@ -1,0 +1,62 @@
+diff --git a/mock/billing.cbl b/mock/billing.cbl
+index 9f45e5c..8ad1a33 100644
+--- a/mock/billing.cbl
++++ b/mock/billing.cbl
+@@ -2,6 +2,7 @@
+       * DATE-WRITTEN 1996-03
+       * CHANGE-LOG
+       * 2009-04-01 TANAKA: Category rate table reviewed.
++      * 2026-09-18 CHG-0417: TAX-RATE-CAT7 changed from 0.08 to 0.10.
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. BILLING.
+        ENVIRONMENT DIVISION.
+@@ -15,7 +16,7 @@
+        01 TAX-RATE-CAT4 PIC 9V99 VALUE 0.08.
+        01 TAX-RATE-CAT5 PIC 9V99 VALUE 0.08.
+        01 TAX-RATE-CAT6 PIC 9V99 VALUE 0.08.
+-       01 TAX-RATE-CAT7 PIC 9V99 VALUE 0.08.
++       01 TAX-RATE-CAT7 PIC 9V99 VALUE 0.10.
+        01 TAX-RATE-CAT8 PIC 9V99 VALUE 0.08.
+        01 INPUT-LINE PIC X(80).
+        01 CATEGORY-NO PIC 9.
+diff --git a/mock/copybooks/rates.cpy b/mock/copybooks/rates.cpy
+index 977991f..d11a3a8 100644
+--- a/mock/copybooks/rates.cpy
++++ b/mock/copybooks/rates.cpy
+@@ -1,9 +1,10 @@
+       * Shared rate-table reference, mirrored by billing.cbl.
++      * 2026-09-18 CHG-0417: TAX-RATE-CAT7 changed from 0.08 to 0.10.
+        01 TAX-RATE-CAT1 PIC 9V99 VALUE 0.08.
+        01 TAX-RATE-CAT2 PIC 9V99 VALUE 0.08.
+        01 TAX-RATE-CAT3 PIC 9V99 VALUE 0.08.
+        01 TAX-RATE-CAT4 PIC 9V99 VALUE 0.08.
+        01 TAX-RATE-CAT5 PIC 9V99 VALUE 0.08.
+        01 TAX-RATE-CAT6 PIC 9V99 VALUE 0.08.
+-       01 TAX-RATE-CAT7 PIC 9V99 VALUE 0.08.
++       01 TAX-RATE-CAT7 PIC 9V99 VALUE 0.10.
+        01 TAX-RATE-CAT8 PIC 9V99 VALUE 0.08.
+diff --git a/mock/tests/test_rates.py b/mock/tests/test_rates.py
+index 39b8238..b75b6aa 100644
+--- a/mock/tests/test_rates.py
++++ b/mock/tests/test_rates.py
+@@ -10,7 +10,7 @@ from run import ROOT, read_rates, tax, execute
+ 
+ rates = read_rates()
+ assert len(rates) == 8
+-assert rates[7] == Decimal('0.08')
++assert rates[7] == Decimal('0.10')
+ copybook = (ROOT / 'copybooks/rates.cpy').read_text()
+ for category, rate in rates.items():
+     assert re.search(rf'TAX-RATE-CAT{category}\s+PIC 9V99 VALUE {rate}\.', copybook)
+@@ -18,8 +18,9 @@ invoices = [(7, 99), (7, 6), (7, 7), (1, 100), (8, 900000)]
+ actual, engine = execute(invoices)
+ expected = [tax(amount, rates[cat]) for cat, amount in invoices]
+ assert actual == expected, (actual, expected)
+-assert actual[0] == 8
+-assert actual[1:3] == [0, 1]
++assert actual[0] == 10
++assert actual[1:3] == [1, 1]
++assert actual[0] == tax(99, rates[7])
+ with (ROOT / 'customers.csv').open() as handle:
+     customers = list(csv.DictReader(handle))
+ assert len(customers) == 3000

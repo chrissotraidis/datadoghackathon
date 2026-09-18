@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hanko impact checks</title>
+<style>
+  body { color: #eceef2; background: #0f1115; font: 16px/1.6 system-ui; max-width: 960px; margin: 40px auto; padding: 0 20px; }
+  pre { white-space: pre-wrap; background: #1b2029; padding: 20px; border-radius: 12px; }
+  a { color: #a9c9ff; } .pass { color: #75d794; } .fail { color: #ff8585; }
+</style>
+<h1>Hanko impact checks</h1>
+<p>Deterministic fixture and real mock checks. Gemini responses are simulated; no API keys or external calls.</p>
+<p><a href="./">Back to Hanko</a></p>
+<pre id="results">Running…</pre>
+<pre id="facts"></pre>
+<script type="module">
+import { parseRequest, analyze, checkPolicy } from './lib/impact.js';
+import { loadMock } from './lib/mockdata.js';
+
+const output = document.querySelector('#results');
+const results = [];
+function check(name, success) {
+  results.push({ name, pass: Boolean(success) });
+  output.textContent = results.map(row => `${row.pass ? 'PASS' : 'FAIL'} ${row.name}`).join('\n');
+}
+const sentenceCount = text => (text.match(/[.!?](?:\s|$)/g) || []).length;
+const demo = 'From April, consumption tax on category 7 goes from 8 to 10 percent.';
+const request = parseRequest(demo);
+const fixture = {
+  files: {
+    'billing.cbl': ['       DATA DIVISION.', '       01 TAX-RATE-CAT7 PIC 9V99 VALUE 0.08.',
+      '       PROCEDURE DIVISION.', '       MAIN.', '           PERFORM CALC-TAX.',
+      '       CALC-TAX.', '           COMPUTE TAX = AMOUNT * TAX-RATE-CAT7.',
+      '       PRINT-INVOICE.', '           DISPLAY TAX.'].join('\n'),
+    'copybooks/rates.cpy': '       01 TAX-RATE-CAT7 PIC 9V99 VALUE 0.08.',
+    'jobs/invoice.jcl': '// TAX-RATE-CAT7\n// TAX-RATE-CAT70\n// OLD-TAX-RATE-CAT7\n// TAX-RATE-CAT7-OLD',
+    'jobs/backup.jcl': '// TAX-RATE-CAT70',
+  },
+  customers: [{ category: 7 }, { category: 7 }, { category: 1 }],
+  lastChanged: { 'TAX-RATE-CAT7': { date: '2009-04-01', by: 'TANAKA' } },
+  policy: { modules: { 'billing.cbl': { owner: 'Tanaka-san', owner_phone: 'env:OWNER_PHONE',
+    backup: 'Sato-san', hours: '09:00-20:00 JST', max_records_without_call: 1 } } },
+};
+
+try {
+  check('request field and category', request.field === 'TAX-RATE-CAT7' && request.category === 7);
+  check('request rates 0.08 → 0.10', request.from === '0.08' && request.to === '0.10');
+  check('complete demo request has no defaults', !request.parsed_with_defaults);
+  const now = new Date();
+  check('effective date is the next April 1', request.effective === `${now.getFullYear() + (now.getMonth() >= 3 ? 1 : 0)}-04-01`);
+  const partial = parseRequest('category 3');
+  check('partial parse preserves category and flags defaults', partial.category === 3
+    && partial.from === '0.08' && partial.effective === '2027-04-01' && partial.parsed_with_defaults);
+  check('empty request uses visible demo defaults', parseRequest('').parsed_with_defaults);
+  check('multi-digit categories are not truncated', parseRequest('category 17').field === 'TAX-RATE-CAT17');
+  check('percent symbol parsing', parseRequest('From April category 7, 8% to 10%').to === '0.10');
+  const changedRequest = date => parseRequest(`From ${date}, category 7 goes from 8 to 10 percent.`);
+  check('explicit year is preserved', changedRequest('April 2030').effective === '2030-04-01');
+  check('explicit day is preserved', changedRequest('April 15').effective.endsWith('-04-15'));
+  check('explicit day and year are preserved', changedRequest('April 15, 2030').effective === '2030-04-15');
+  check('day before month is preserved', changedRequest('15 April 2030').effective === '2030-04-15');
+  check('compact comma-separated date preserves year', changedRequest('April 15,2030').effective === '2030-04-15');
+  check('ISO date is preserved', changedRequest('2030-04-15').effective === '2030-04-15');
+  check('invalid calendar date blocks approval', changedRequest('April 31, 2027').parsed_with_defaults);
+  check('invalid leap date blocks approval', changedRequest('2027-02-29').parsed_with_defaults);
+  check('valid leap date is preserved', changedRequest('2028-02-29').effective === '2028-02-29');
+  check('ambiguous months block approval', changedRequest('April or May').parsed_with_defaults);
+  check('unsupported date qualifier blocks approval', changedRequest('end of April').parsed_with_defaults);
+  const fractional = parseRequest('From April, category 7 goes from 8.1 to 9.6 percent.');
+  check('fractional percentages retain precision', fractional.from === '0.081' && fractional.to === '0.096');
+  const precise = parseRequest('From April, category 7 goes from 8.125 to 10.025 percent.');
+  check('percentage division has no rounding', precise.from === '0.08125' && precise.to === '0.10025');
+  check('negative percentage sign is preserved', parseRequest('From April, category 7 goes from -8 to 10 percent.').from === '-0.08');
+  check('unsupported decimal comma is flagged', parseRequest('From April category 7, 8,1 to 9,6 percent.').parsed_with_defaults);
+  const impact = await analyze(request, fixture);
+  check('fixture definition line', impact.definition.line === 2);
+  check('fixture paragraph and inclusive source lines', impact.paragraph.name === 'CALC-TAX'
+    && impact.paragraph.start_line === 6 && impact.paragraph.end_line === 7);
+  check('exact field tokens only, definition excluded', impact.references.length === 3
+    && !impact.references.some(ref => ref.text.includes('CAT70') || ref.text.includes('-OLD')));
+  check('unique referencing jobs; backup excluded', impact.jobs.join(',') === 'invoice.jcl');
+  check('fixture affected and total counts', impact.affected_records === 2 && impact.total_records === 3);
+  check('fixture summary has two sentences', sentenceCount(impact.summary) === 2);
+  const policy = checkPolicy(request, impact, fixture.policy);
+  check('policy tax, rate, records; call required', policy.tripped.join(',') === 'tax,rate,records' && policy.requires_call);
+  check('env phone has safe empty default', policy.owner_phone === '');
+  const atLimit = checkPolicy(request, { affected_records: 1 }, fixture.policy);
+  check('record threshold is strictly greater', !atLimit.tripped.includes('records'));
+  const missing = await analyze({ ...request, field: 'TAX-RATE-CAT70', category: 70 }, fixture);
+  check('missing definition/paragraph/history stay unknown', missing.definition.line === 0
+    && missing.paragraph.name === 'unknown' && missing.last_changed.date === 'unknown');
+  check('missing paragraph explicitly reported in summary', missing.summary.includes('could not be found'));
+  const commentFixture = structuredClone(fixture);
+  commentFixture.files['billing.cbl'] = commentFixture.files['billing.cbl']
+    .replace('           PERFORM CALC-TAX.', '      * TAX-RATE-CAT7\n           PERFORM CALC-TAX.');
+  check('comment alone does not select paragraph', (await analyze(request, commentFixture)).paragraph.name === 'CALC-TAX');
+
+  const originalFetch = globalThis.fetch;
+  try {
+    let captured;
+    globalThis.fetch = async (url, options) => {
+      captured = { url: String(url), options };
+      return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{
+        text: 'The billing change affects 2 of 3 customers. There is 1 nightly job that reads the rate.'
+      }] } }] }) };
+    };
+    const generated = await analyze(request, fixture, 'test-only-placeholder');
+    check('valid Gemini response accepted', generated.summary_source === 'gemini');
+    check('API key is header-only', !captured.url.includes('test-only-placeholder')
+      && captured.options.headers['x-goog-api-key'] === 'test-only-placeholder');
+    globalThis.fetch = async () => { throw new Error('Simulated network failure'); };
+    check('Gemini network error falls back', (await analyze(request, fixture, 'test')).summary_source === 'template');
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ candidates: [{ content: {
+      parts: [{ text: 'It affects 9999 customers. Everything will be fine.' }]
+    } }] }) });
+    check('invented Gemini counts rejected', (await analyze(request, fixture, 'test')).summary_source === 'template');
+  } finally { globalThis.fetch = originalFetch; }
+
+  const mock = await loadMock();
+  const real = await analyze(request, mock);
+  check('real mock: CALC-TAX paragraph', real.paragraph.name === 'CALC-TAX');
+  check('real mock: 3 jobs, no backup', real.jobs.length === 3 && !real.jobs.includes('backup.jcl'));
+  check('real mock: 1,214 affected customers', real.affected_records === 1214);
+  check('real mock: 3,000 total customers', real.total_records === 3000);
+  check('real mock: last changed 2009-04-01', real.last_changed.date === '2009-04-01');
+  check('real mock: exactly two template sentences', real.summary_source === 'template' && sentenceCount(real.summary) === 2);
+  check('real mock: correct definition source', mock.files[real.definition.file].split(/\r?\n/)[real.definition.line - 1].includes('TAX-RATE-CAT7 PIC'));
+  check('real mock: source line references are traceable', real.references.every(ref =>
+    mock.files[ref.file].split(/\r?\n/)[ref.line - 1].trim() === ref.text));
+  check('real mock: policy requires owner approval', checkPolicy(request, real, mock.policy).requires_call);
+  document.querySelector('#facts').textContent = JSON.stringify({ request, impact: real,
+    policy: checkPolicy(request, real, mock.policy) }, null, 2);
+} catch (error) { check(`Unexpected error: ${error.message}`, false); }
+globalThis.__impactTestResults = results;
+output.className = results.every(row => row.pass) ? 'pass' : 'fail';
+output.textContent += `\n\n${results.filter(row => row.pass).length}/${results.length} passed`;
+</script>
+</html>

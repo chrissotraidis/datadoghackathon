@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hanko — call self-test</title>
+<style>
+  :root { color-scheme: dark; font: 16px system-ui; background: #101719; color: #edf1e9; }
+  body { max-width: 860px; margin: 48px auto; padding: 0 24px; }
+  button { font: inherit; padding: 12px 18px; margin: 8px 8px 8px 0; cursor: pointer; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 20px; background: #182124; }
+  a { color: #bddb99; } #result { font-weight: 700; }
+</style>
+<h1>Approval call self-test</h1>
+<p>The canned test makes no network calls and runs in four seconds. The configured test can ring the configured owner's phone or use this browser's microphone.</p>
+<p id="mode">Loading configuration…</p>
+<button id="canned">Run canned test</button>
+<button id="configured">Run in configured mode</button>
+<p id="result" role="status"></p>
+<pre id="output" aria-live="polite"></pre>
+<p><a href="./">Back to Hanko</a></p>
+<script type="module">
+  import { requestApproval, alreadyCalled } from './lib/call.js';
+  // Optional local config; a missing file must not block a canned test.
+  try { const r = await fetch('./config.js'); if (r.ok) await import('./config.js'); } catch {}
+  document.querySelector('#mode').textContent = `Configured mode: ${window.HANKO?.demoMode || 'not configured'}`;
+  const policy = { owner: 'Tanaka-san', requires_call: true, owner_phone: 'env:OWNER_PHONE', hours: '09:00-20:00 JST', tripped: ['tax', 'records'], channel: 'phone' };
+  const request = { id: 'CHG-CALL-SELFTEST', text: 'From April, consumption tax on category 7 goes from 8 to 10 percent.' };
+  const impact = { paragraph: { name: 'CALC-TAX' }, definition: { file: 'billing.cbl', line: 17 }, jobs: ['nightly_invoice', 'monthly_close', 'tax_report'], affected_records: 1214, total_records: 3000,
+    last_changed: { date: '2009-04-01', by: 'TANAKA' }, summary: 'The tax rate changes for category 7. It affects 1,214 customers.' };
+  const out = document.querySelector('#output');
+  const status = document.querySelector('#result');
+  const buttons = [...document.querySelectorAll('button')];
+  async function run(canned) {
+    buttons.forEach(button => { button.disabled = true; }); out.textContent = ''; status.textContent = 'Running…';
+    const config = canned ? { demoMode: 'canned' } : window.HANKO || {};
+    const testRequest = { ...request, id: canned ? 'CHG-CANNED-SELFTEST' : request.id };
+    // Reset only the synthetic canned fixture. A live test's one-call lock stays intact.
+    try {
+      if (canned) localStorage.removeItem('hanko.called.' + testRequest.id);
+      const decision = await requestApproval({ policy, request: testRequest, impact, config,
+        onStatus: (event, rows) => { out.textContent += event + (rows ? ` (${rows.length} lines)` : '') + '\n'; } });
+      out.textContent += JSON.stringify(decision, null, 2) + '\n';
+      if (canned) {
+        const repeat = await requestApproval({ policy, request: testRequest, impact, config });
+        const pass = decision.decision === 'conditional' && decision.attempted === true && decision.transcript.length === 4 && !decision.error
+          && alreadyCalled(testRequest.id) && repeat.decision === 'no_answer' && repeat.attempted === false && /one call/.test(repeat.error);
+        status.textContent = pass ? 'PASS — canned condition, transcript and one-call lock' : 'FAIL';
+      } else status.textContent = decision.error ? `HOLD — ${decision.error}` : `Completed: ${decision.decision}`;
+    } catch (error) { status.textContent = `FAIL — ${error.message}`; }
+    finally { buttons.forEach(button => { button.disabled = false; }); }
+  }
+  document.querySelector('#canned').onclick = () => run(true);
+  document.querySelector('#configured').onclick = () => run(false);
+</script>
+</html>

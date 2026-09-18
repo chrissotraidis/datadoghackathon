@@ -26,7 +26,13 @@ Mock files are fetched from ../mock/.
   decision: "approved" | "conditional" | "rejected" | "no_answer",
   condition_text: string, rationale_quote: string,
   transcript: [ { role: "agent" | "user", text: string } ],
-  started_at: string, ended_at: string, error: string | null }
+  started_at: string, ended_at: string, error: string | null,
+  attempted: boolean }
+
+attempted is true only when this invocation owns the reservation and initiates a
+conversation. Preflight and duplicate rejections return false and do not enter
+the ledger. The UI may retain transcript, rationale, full diff SHA-256/snapshot,
+test-evidence match, effective date, eligibility and condition task on LedgerRow.
 
 ## LedgerRow
 { change_id: string, request_text: string, facts_summary: string, diff_hash: string,
@@ -57,5 +63,9 @@ window.HANKO = { elevenKey, agentId, phoneNumberId, ownerPhone, geminiKey, demoM
 ## Rules
 - Every module works in demoMode "canned" with no keys.
 - One approval call per change_id, ever. call.js enforces it with localStorage key hanko.called.<change_id>.
+- Reset demo clears simulated rows/locks only; live evidence remains.
+- The available proposal is category 7, 0.08 to 0.10, effective 2027-04-01.
+  Other or defaulted requests may be analyzed but cannot approve that diff.
+- All outcomes remain held for release. This app never merges or deploys a change.
 - Never throw to the UI. Return decision "no_answer" with error set.
 - Files under 300 lines. No frameworks. No build step.
