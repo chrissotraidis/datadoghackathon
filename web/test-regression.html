@@ -10,7 +10,7 @@
 const version = Date.now();
 const { parseRequest, analyze, checkPolicy } = await import(`./lib/impact.js?regression=${version}`);
 const { loadMock } = await import(`./lib/mockdata.js?regression=${version}`);
-const { requestApproval, alreadyCalled } = await import(`./lib/call.js?regression=${version}`);
+const { requestApproval, alreadyCalled, confirmationQuote } = await import(`./lib/call.js?regression=${version}`);
 const ledger = await import(`./lib/ledger.js?regression=${version}`);
 const output = document.querySelector('#output');
 const button = document.querySelector('#run');
@@ -51,7 +51,7 @@ button.onclick = async () => {
     const secondModule = await import(`./lib/call.js?regression-independent=${version}`);
     const results = await Promise.all([requestApproval(args), secondModule.requestApproval(args)]);
     report('independent-module concurrent lock owner', results.filter(r => r.attempted === true).length === 1 && results.filter(r => r.attempted === false).length === 1);
-    report('canned condition and four transcript lines', results.some(r => r.decision === 'conditional' && r.transcript.length === 4));
+    report('canned condition and final yes', results.some(r => r.decision === 'conditional' && r.transcript.length === 6 && r.confirmation_quote === 'Yes, I confirm.'));
     const invalid = await requestApproval({...args, request:{...request,id:'REG-PREFLIGHT'},config:{demoMode:'phone'}});
     report('preflight does not own attempt or lock', invalid.attempted === false && !alreadyCalled('REG-PREFLIGHT'));
     let raw = 'approved', condition = '', calls = 0, conversationTranscript = [];
@@ -67,6 +67,7 @@ button.onclick = async () => {
     const mockedCall = async extra => requestApproval({...args,config:phone,request:{...request,id:'REG-PHONE-'+sequence++},...extra});
     for (const [value, text, expected] of [['not approved','','no_answer'],['approved','','approved'],['approved','Check rounding','conditional'],['conditional','','no_answer'],['maybe approved','','no_answer'],['rejected','Too risky','rejected']]) {
       conversationTranscript = [{role:'user',message:value==='rejected' ? 'I reject this change. Too risky.' : value==='approved' ? `I approve this change.${text ? ' With a condition: '+text : ''}` : value}];
+      if (value === 'approved') conversationTranscript.push({role:'agent',message:'To confirm: you approve this change. Do you confirm approval of this change? Please say yes or no.'},{role:'user',message:'Yes, I confirm.'});
       raw=value;condition=text;const result=await mockedCall();report(`decision ${JSON.stringify(value)} / ${JSON.stringify(text)}`,result.decision===expected&&result.attempted===true);
     }
     for (const [label, rows] of [['absent transcript',undefined],['empty transcript',[]],['agent-only voicemail',[{role:'agent',message:'Are you there? Chris will follow up.'}]],['blank owner speech',[{role:'user',message:'   '}]]]) {
@@ -77,6 +78,25 @@ button.onclick = async () => {
         report(`${label} cannot establish ${value}`,result.decision==='no_answer'&&Boolean(result.error)&&result.attempted===true&&result.conversation_id==='regression-mock'&&alreadyCalled('REG-PHONE-'+(sequence-1)));
       }
     }
+    const question = {role:'agent',message:'To confirm: you approve this change. Do you confirm approval of this change? Please say yes or no.'};
+    for (const [label, rows, expected] of [
+      ['greeting yes is not final',[{role:'agent',message:'Is now okay?'},{role:'user',message:'Yes.'}],false],
+      ['initial approve it is not final',[{role:'user',message:'Approve it.'}],false],
+      ['question without answer',[question],false],
+      ['explicit final yes',[question,{role:'user',message:'Yes.'}],true],
+      ['explicit yes I confirm',[question,{role:'user',message:'Yes, I confirm.'}],true],
+      ['okay is not explicit yes',[question,{role:'user',message:'Okay.'}],false],
+      ['final no',[question,{role:'user',message:'No.'}],false],
+      ['yes with new condition',[question,{role:'user',message:'Yes, but change the date.'}],false],
+      ['incomplete interrupted readback',[{role:'agent',message:'To confirm: you approve this change. Do you confirm appro...',interrupted:true},{role:'user',message:'Yes.'}],false],
+      ['complete question before interruption',[{...question,interrupted:true},{role:'user',message:'Yes.'}],true],
+      ['later withdrawal',[question,{role:'user',message:'Yes.'},{role:'agent',message:'Recorded.'},{role:'user',message:'Wait, cancel that.'}],false]
+    ]) {
+      conversationTranscript=rows;raw='approved';condition='';const result=await mockedCall();
+      report(label,Boolean(confirmationQuote(rows))===expected&&result.decision===(expected?'approved':'no_answer'));
+    }
+    conversationTranscript=[question,{role:'user',message:'Yes, but not yet.'}];raw='conditional';condition='Check rounding';
+    report('conditional decision also needs unambiguous final yes',(await mockedCall()).decision==='no_answer');
     const before = calls;
     const noPolicy = await mockedCall({policy:{...policy,requires_call:false}});
     report('no policy trigger makes no call',calls===before&&noPolicy.attempted===false);

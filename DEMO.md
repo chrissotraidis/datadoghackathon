@@ -13,7 +13,8 @@ Use **Demo Studio** at `http://127.0.0.1:8000/web/?view=demo` when presenting.
 3. **Analyze request** → **Next: review the edit** → **Next: prepare the call**.
 4. Read the Tanaka-san cue card, then press **Call my phone** when ready to answer.
    In simulated mode the button says **Start simulated call**.
-5. Give the condition and confirm its readback. Wait for the agent to end.
+5. Answer naturally; you can ask which customers are affected. Give the condition,
+   then wait for “Do you confirm approval of this change?” and say **“Yes, I confirm.”** Wait for the agent to end.
 6. Show the held decision; open **Read transcript & evidence** in its ledger row.
 
 A fresh rehearsal is a separate demo review of the same proposal, with its own
@@ -62,7 +63,7 @@ Introduce it once: “The billing data is fictional; this is a live agent conver
 
 1. When asked whether now is okay: “Yes, go ahead.”
 2. When asked for a decision: “I approve, with one condition. Check the rounding on invoices under 100 yen. Small invoices always caused trouble in 2009.”
-3. After the readback: “Yes, that is right.”
+3. After the readback: “Yes, I confirm.”
 4. Wait for goodbye, automatic end and the app's completed ledger row.
 
 ## Internal rehearsal notes

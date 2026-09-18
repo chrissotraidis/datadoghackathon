@@ -42,7 +42,7 @@
       out.textContent += JSON.stringify(decision, null, 2) + '\n';
       if (canned) {
         const repeat = await requestApproval({ policy, request: testRequest, impact, config });
-        const pass = decision.decision === 'conditional' && decision.attempted === true && decision.transcript.length === 4 && !decision.error
+        const pass = decision.decision === 'conditional' && decision.attempted === true && decision.transcript.length === 6 && !decision.error
           && alreadyCalled(testRequest.id) && repeat.decision === 'no_answer' && repeat.attempted === false && /one call/.test(repeat.error);
         status.textContent = pass ? 'PASS — canned condition, transcript and one-call lock' : 'FAIL';
       } else status.textContent = decision.error ? `HOLD — ${decision.error}` : `Completed: ${decision.decision}`;

@@ -55,7 +55,7 @@ from the browser, so the key is readable by anyone using that local page.
 | `geminiKey` | Optional Google Gemini key; empty uses deterministic summary |
 | `demoMode` | `canned`, `phone`, or `browser` |
 
-- **canned:** a four-second simulated conversation. No network or microphone.
+- **canned:** a five-second simulated conversation. No network or microphone.
   The UI and print view explicitly mark it simulated, not human sign-off.
 - **phone:** calls the configured owner via ElevenLabs/Twilio, polls conversation
   analysis, and stores the real transcript and decision. Requires all four
@@ -65,8 +65,9 @@ from the browser, so the key is readable by anyone using that local page.
   no approval is inferred. Use localhost or HTTPS for microphone and Web Locks.
 
 The configured agent uses six dynamic variables and three analysis fields:
-`decision`, `condition_text`, `rationale_quote`. It reads conditions back for
-confirmation and ends the conversation. Only exact recognized decisions count;
+`decision`, `condition_text`, `rationale_quote`. It reads every approval back and asks “Do you confirm approval of this change?”
+The app requires a new explicit yes after that question. Greeting yes, an initial
+“approve it,” and ambiguous responses cannot approve. It then ends the conversation. Only exact recognized decisions count;
 missing/ambiguous results remain held. No automated retries or backup calls are
 implemented. A live attempt consumes the local one-call lock even if it fails.
 

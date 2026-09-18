@@ -24,7 +24,7 @@
 - Desktop and 390px mobile layout inspected; no document overflow. Print HTML
   includes escaped transcript and exact diff; native print dialog not asserted.
 
-- Independent integration regression: **43/43 PASS** in browser with isolated
+- Independent integration regression: **55/55 PASS** in browser with isolated
   storage and mocked network; explicit dates/fractional rates preserve their
   values, incomplete source evidence prevents dialing, and setup failures release
   only unattempted reservations. Missing owner transcript cannot establish a
@@ -77,3 +77,27 @@
 - Live browser microphone conversation and request speech recognition.
 - Optional live Gemini summary (currently deterministic template).
 - Backup demo video and hackathon submission are not completed by these tests.
+
+## Final confirmation fix · 19:35 JST
+
+- The user's live call completed and produced an approval, but the old prompt
+  accepted “Approve it” before a mandatory readback. Its original receipt remains
+  preserved and is labeled as not checked under the final-yes rule.
+- Published agent version `agtvrsn_7401m2t15k92fgbrcae3nhxk1hdy` asks one question
+  per turn, invites a question, reads the decision back, and waits for a fresh
+  explicit yes. Silence timeout is 12 seconds; maximum call length is 4 minutes.
+- A live-model text simulation answered a customer-impact question, preserved
+  the condition/rationale, asked the final confirmation, received “Yes, I confirm,”
+  extracted conditional and invoked end_call with the correct closing message.
+- App-side transcript check separately requires yes after the final question.
+  Greeting yes, initial approve it, okay, missing answer, incomplete interrupted readback,
+  revised condition and later withdrawal stay held. Both conditional and plain
+  approval require this check. 55/55 isolated browser regressions pass.
+- Spoken acceptance of the revised version remains the final human check.
+
+- A second live-model simulation reproduced the reported “Approve it” trigger.
+  The agent now asked its final confirmation, waited for a fresh “Yes,” and only
+  then extracted approved. Both model transcripts pass the app confirmation
+  check; the original human call correctly fails that new rule.
+- Updated complete canned Studio flow passed with a visible final-confirmation
+  quote, conditional-approval receipt, retained prior records and no console errors.

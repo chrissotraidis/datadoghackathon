@@ -226,3 +226,5 @@ body:not([data-view="demo"]) .demo-only,body[data-view="demo"] .workspace-only{d
 @media print{.space-nav,.workspace-intro,.studio-controls{display:none}}
 
 .record-library{border-top:1px solid var(--border)}.record-detail{border-bottom:1px solid var(--border);padding:16px 0}.record-detail summary{cursor:pointer;color:#dcc7b6;font-size:13px;line-height:1.8}.record-detail>summary>span:first-child{font:10px var(--mono);color:#abb5c5;margin-right:15px}.record-detail[open]>summary{margin-bottom:15px}.record-detail p{font-size:13px;color:#ccd1da}.record-detail .record-meta{color:#9da8b8;font:10px/1.9 var(--mono);overflow-wrap:anywhere}.saved-transcript{border-left:2px solid #96705b;padding:1px 0 1px 17px;margin:17px 0}.saved-transcript strong{color:#e3c4ae}.record-detail .diff{padding:15px;white-space:pre-wrap;overflow-wrap:anywhere}
+
+.confirmation-proof{color:#94d9a8!important;background:#1c3327;border:1px solid #3f7051;border-radius:6px;padding:12px 15px;font-size:15px!important}.decision-card h3{line-height:1.4}

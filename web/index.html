@@ -7,9 +7,9 @@
   <meta name="description" content="Human judgment, on the record. Hanko binds a spoken approval to the exact change.">
   <title>Hanko — The stamp for agents</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23d23b3b'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='42' fill='white'%3E判%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=20260918-6">
-  <script src="config.js?v=20260918-6"></script>
-  <script type="module" src="app.js?v=20260918-6"></script>
+  <link rel="stylesheet" href="styles.css?v=20260918-8">
+  <script src="config.js?v=20260918-8"></script>
+  <script type="module" src="app.js?v=20260918-8"></script>
 </head>
 <body>
   <div class="shell">
@@ -45,7 +45,7 @@
         <div class="panel-heading"><h2 id="call-title"><span class="step">04</span>Call Tanaka-san</h2><span id="call-pill" class="pill idle">Awaiting impact</span></div>
         <p id="role-instructions" class="section-intro demo-only">You are Tanaka-san, the person who knows this billing system. Keep your phone nearby and use the three responses below.</p>
         <div id="policy-content" class="empty-state"><span class="empty-icon" aria-hidden="true">↗</span><p>The right person. The actual context.<small>Policy names the owner and decides when a conversation is required.</small></p></div>
-        <div class="rehearsal-script demo-only" id="owner-script"><div class="script-heading"><span class="guide-kicker">YOUR ROLE · TANAKA-SAN</span><span class="script-label">Read aloud when asked</span></div><ol><li><div><span>Hanko asks if now is a good time</span><p>“Yes, go ahead.”</p></div></li><li><div><span>Hanko explains the change and asks for your decision</span><p>“I approve, with one condition. Check the rounding on invoices under 100 yen. Small invoices always caused trouble in 2009.”</p></div></li><li><div><span>Hanko reads your condition back</span><p>“Yes, that is right.”</p></div></li></ol><p class="script-result">Then wait for Hanko to say goodbye. Your condition should appear below, with the change <strong>HELD</strong>.</p></div>
+        <div class="rehearsal-script demo-only" id="owner-script"><div class="script-heading"><span class="guide-kicker">YOUR ROLE · TANAKA-SAN</span><span class="script-label">Read aloud when asked</span></div><ol><li><div><span>Hanko asks if now is a good time</span><p>“Yes, go ahead.”</p></div></li><li><div><span>Hanko explains the change and asks for your decision</span><p>“I approve, with one condition. Check the rounding on invoices under 100 yen. Small invoices always caused trouble in 2009.”</p></div></li><li><div><span>Hanko reads your decision back and asks for final confirmation</span><p>“Yes, I confirm.”</p></div></li></ol><p class="script-result">Your first yes only agrees to talk. Your final yes confirms the decision. Then wait for Hanko to say goodbye. Your condition should appear below, with the change <strong>HELD</strong>.</p></div>
         <div class="call-action"><button id="call" class="primary" type="button" disabled><span aria-hidden="true">↗</span> Call my phone</button><span id="call-status" class="muted" role="status" aria-live="polite">One call per change. Every word on the record.</span></div>
         <p id="call-error" class="notice" role="status" hidden></p><div id="transcript" class="transcript" aria-live="polite" aria-label="Approval transcript" hidden></div><div id="decision-result" hidden></div>
       </section>

@@ -82,6 +82,24 @@ function transcript(rows) {
     .map(row => ({ role: row.role, text: string(row.message ?? row.text) })).filter(row => row.text) : [];
 }
 
+export function confirmationQuote(rows) {
+  let waiting = false, quote = '';
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const text = string(row.message ?? row.text).trim();
+    if (!text) continue;
+    if (row.role === 'agent') {
+      waiting = /do you confirm (?:your )?approval of this change\?/i.test(text);
+      if (waiting) quote = '';
+    } else if (row.role === 'user') {
+      if (waiting) {
+        quote = /^yes\b/i.test(text) && !/\b(no|not|but|unless|if|except|wait|actually|maybe)\b/i.test(text) ? text : '';
+        waiting = false;
+      } else if (/\b(no|not|wait|actually|cancel|reject|changed my mind)\b/i.test(text)) quote = '';
+    }
+  }
+  return quote;
+}
+
 function extract(data) {
   const fields = data.analysis?.data_collection_results || {};
   const raw = string(fields.decision?.value).trim().toLowerCase();
@@ -94,8 +112,10 @@ function extract(data) {
   const userText = transcript(data.transcript).filter(row => row.role === 'user').map(row => row.text).join(' ');
   if (!userText.trim()) decision = 'no_answer'; // Analysis alone cannot establish an owner's decision.
   if (decision === 'approved' && /\b(not approved|do not approve|don't approve|cannot approve|can't approve|unsure|not sure|i reject)\b/i.test(userText)) decision = 'no_answer';
-  return { decision, condition_text, rationale_quote,
-    error: decision === 'no_answer' ? 'No unambiguous approval decision was captured. Change is on hold.' : null };
+  const confirmation_quote = confirmationQuote(data.transcript);
+  if (['approved', 'conditional'].includes(decision) && !confirmation_quote) decision = 'no_answer';
+  return { decision, condition_text, rationale_quote, confirmation_quote,
+    error: decision === 'no_answer' ? 'No explicit final yes was confirmed after the decision readback. Change is on hold.' : null };
 }
 
 async function api(path, body, config, log, timeout = 15000) {
@@ -178,7 +198,9 @@ async function canned(request, emit, result) {
     { role: 'agent', text: 'This is Hanko calling about the billing change. Do you approve it?' },
     { role: 'user', text: 'Approved, but check the rounding on invoices under 100 yen.' },
     { role: 'user', text: 'Small invoices always caused trouble in 2009.' },
-    { role: 'agent', text: 'Recorded as conditional. Thank you.' }
+    { role: 'agent', text: 'To confirm: you approve with the condition to check rounding on invoices under 100 yen. Do you confirm approval of this change? Please say yes or no.' },
+    { role: 'user', text: 'Yes, I confirm.' },
+    { role: 'agent', text: 'Your conditional approval is recorded. The change stays held until the condition is addressed. Goodbye.' }
   ];
   emit('dialing'); await delay(500); emit('ringing'); await delay(500); emit('in_call');
   for (const line of lines) {
@@ -186,7 +208,7 @@ async function canned(request, emit, result) {
   }
   emit('processing'); await delay(1000);
   return Object.assign(result, { conversation_id: 'canned-' + request.id, decision: 'conditional',
-    condition_text: lines[1].text, rationale_quote: lines[2].text });
+    condition_text: lines[1].text, rationale_quote: lines[2].text, confirmation_quote: lines[4].text });
 }
 
 export async function requestApproval(input = {}) {
