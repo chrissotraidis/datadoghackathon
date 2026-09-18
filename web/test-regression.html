@@ -97,6 +97,18 @@ button.onclick = async () => {
     }
     conversationTranscript=[question,{role:'user',message:'Yes, but not yet.'}];raw='conditional';condition='Check rounding';
     report('conditional decision also needs unambiguous final yes',(await mockedCall()).decision==='no_answer');
+    const realNow = Date.now;
+    try {
+      for (const [label, instant] of [['after 20:00 JST','2026-09-18T11:30:00Z'],['midnight JST','2026-09-18T15:00:00Z'],['before 09:00 JST','2026-09-18T23:59:00Z']]) {
+        Date.now = () => Date.parse(instant);
+        conversationTranscript=[question,{role:'user',message:'Yes, I confirm.'}];raw='approved';condition='';
+        const result=await mockedCall({policy:{...policy,hours:mock.policy.modules['billing.cbl'].hours}});
+        report('demo calls allowed '+label,result.attempted===true&&result.decision==='approved');
+      }
+      Date.now = () => Date.parse('2026-09-18T11:30:00Z');
+      const beforeClosed=calls,closed=await mockedCall({policy:{...policy,hours:'09:00-20:00 JST'}});
+      report('explicit restricted policy still enforced',closed.attempted===false&&calls===beforeClosed);
+    } finally { Date.now=realNow; }
     const before = calls;
     const noPolicy = await mockedCall({policy:{...policy,requires_call:false}});
     report('no policy trigger makes no call',calls===before&&noPolicy.attempted===false);

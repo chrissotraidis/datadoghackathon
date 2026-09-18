@@ -1,7 +1,7 @@
 import { readPreferences, prefersReducedMotion } from './preferences.js?v=20260918-polish';
 import { loadMock } from './lib/mockdata.js?v=20260918-8';
 import { parseRequest, analyze, checkPolicy } from './lib/impact.js?v=20260918-8';
-import { requestApproval, alreadyCalled } from './lib/call.js?v=20260918-8';
+import { requestApproval, alreadyCalled } from './lib/call.js?v=20260918-anytime';
 import * as ledger from './lib/ledger.js?v=20260918-8';
 
 const $ = id => document.getElementById(id);

@@ -123,3 +123,11 @@
   snapshot confirmed `conversation_config` and `platform_settings` unchanged.
 - No outbound phone call or live microphone session was made in this pass.
   Revised-agent spoken human acceptance remains separate and pending.
+
+## Anytime demo calling
+
+The user requested unrestricted demo hours. The fixture policy now explicitly
+uses `24/7`, which the shared phone/browser call preflight accepts. Existing
+restricted-hour policies still enforce their configured window. Browser
+regressions pass **59/59**, including mocked phone approval at 20:30, midnight,
+and 08:59 JST. The app displays `24/7`; no live call was placed by this check.

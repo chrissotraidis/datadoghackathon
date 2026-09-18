@@ -19,6 +19,7 @@ function sanitize(value, config) {
 }
 
 function checkHours(hours) {
+  if (hours === '24/7') return;
   const match = string(hours).match(/^(\d{2}):(\d{2})-(\d{2}):(\d{2})\s+JST$/);
   if (!match) throw new Error('Policy: owner hours must use HH:MM-HH:MM JST.');
   const [, h1, m1, h2, m2] = match.map(Number);

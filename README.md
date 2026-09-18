@@ -73,7 +73,7 @@ from the browser, so the key is readable by anyone using that local page.
   The UI and print view explicitly mark it simulated, not human sign-off.
 - **phone:** calls the configured owner via ElevenLabs/Twilio, polls conversation
   analysis, and stores the real transcript and decision. Requires all four
-  ElevenLabs/phone settings. Policy allows calls 09:00–20:00 JST only.
+  ElevenLabs/phone settings. The demo policy allows calls 24/7, including after 20:00 JST.
 - **browser:** uses your microphone with the same ElevenLabs agent. Conversation
   analysis still needs the API key; without it, the transcript remains held and
   no approval is inferred. Use localhost or HTTPS for microphone and Web Locks.

@@ -34,7 +34,7 @@ These demonstration reviews do not grant production authorization.
 | Impact | Exact-token search across the six loaded legacy source files; source definition and paragraph lines; distinct referencing JCL files; category count from CSV; history from the fixture metadata. | `CALC-TAX` lines 38–50; definition line 18; five references; three jobs; 1,214/3,000 records; history 2009-04-01. Missing evidence stays visibly unknown. |
 | Summary | Deterministic two-sentence template; optional Gemini can rewrite supplied facts with a timeout and fallback. | Facts and policy never depend on Gemini. Current verified demo uses the template. |
 | Change | Display the proposal diff and test output; snapshot diff and full SHA-256 before the approval attempt. | Proposal evidence refers to the same diff hash. Baseline remains on `main`; proposed code remains unmerged on `chg-0417`. |
-| Policy | Named owner; tax/rate/record triggers; live-call hours 09:00–20:00 JST; local one-call reservation. | Preflight rejection places no call. Duplicate attempts cannot place another live call for the same review ID. No automatic retries or backup calls. |
+| Policy | Named owner; tax/rate/record triggers; 24/7 demo calling; local one-call reservation. | Preflight rejection places no call. Duplicate attempts cannot place another live call for the same review ID. No automatic retries or backup calls. |
 | Conversation | ElevenLabs phone or browser conversation, or clearly labeled canned simulation. Ask one question at a time. Read back every approval and require a fresh explicit yes to the final confirmation question. | Extract recognized decision, verbatim condition and rationale; end the conversation; ambiguity or missing confirmation stays held. |
 | Record | Local ledger saves request, facts, owner, time, channel, transcript, condition task, rationale, conversation ID, exact diff and hash. Printable copy includes the evidence. | Conditional means HELD with an open condition. Reloading a proposal cannot alter the recorded diff. Reset removes canned records and preserves live evidence/locks. |
 
@@ -82,8 +82,8 @@ No microphone or outbound phone call was used for that acceptance.
 
 1. Preserve the real No answer / HELD receipt and its call lock. Spoken human
    approval remains a future acceptance gate, not grounds to retry this change.
-   The planned 20:00 stage slot is outside the current live-call window; show
-   the saved receipt/video or a labeled simulation.
+   The demo policy now allows live calls at any time. Use New rehearsal
+   in Demo Studio for another explicit attempt while retaining earlier receipts.
 2. Show matched test evidence only when its SHA-256 equals the displayed diff;
    a generic passing JSON flag is not proof for a newly reloaded proposal.
 3. Keep the final condition, HELD state, channel and short diff hash together

@@ -69,7 +69,7 @@ Introduce it once: “The billing data is fictional; this is a live agent conver
 ## Internal rehearsal notes
 
 - Open `http://127.0.0.1:8000/web/?view=demo`; confirm mode, proposal hash **3ae78ec9**, matched test evidence and fresh modules. Use typed/demo input unless speech recognition has been rehearsed.
-- Live policy hours are **09:00–20:00 JST**, excluding 20:00. The planned stage starts at 20:00; use saved evidence/video or labeled simulation then. Do not weaken the hours.
+- Demo calls are available **24/7**, including after 20:00 JST. Use **New rehearsal** for a fresh attempt; previous receipts stay saved.
 - One live attempt consumes its local lock. Reset clears canned evidence only; it preserves live records/locks. If a live attempt exists, show its receipt rather than retrying or clearing storage.
 - All outcomes remain held for release: the fixture has no effective-date guard, and Hanko has no deployment operation. JCL files are counted references, not executed scheduler jobs.
 - Gemini and request speech recognition remain optional/unaccepted. The verified summary is a deterministic template. A failed summary needs no stage recovery.

@@ -4,7 +4,7 @@
       "owner": "Tanaka-san",
       "owner_phone": "env:OWNER_PHONE",
       "backup": "Sato-san",
-      "hours": "09:00-20:00 JST",
+      "hours": "24/7",
       "channel": "phone",
       "high_impact": [
         "tax",
