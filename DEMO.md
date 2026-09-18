@@ -1,6 +1,11 @@
 # Hanko demo card
 
-**The stamp for agents.** An AI proposes the code change; Hanko keeps the human judgment attached to it.
+**Accountability for AI changes.** Passing tests does not authorize a business change. Hanko connects company policy, a named owner and a decision record tied to the exact proposal.
+
+**The scenario:** Tanaka-san maintained this billing system before retiring.
+The company retains him as a technical adviser for critical changes in his area.
+AI prepares the edit; company policy names him as the approver. Hanko captures
+his decision and reasoning so the current team keeps the context.
 
 ## Open the right space
 
@@ -28,10 +33,10 @@ The current live session already has a No answer / HELD receipt from voicemail; 
 
 | Time | Action | Say |
 | --- | --- | --- |
-| 0–7s | Point to Hanko. | “An AI can edit an old billing system. The person who understands it still needs to judge the change. Hanko keeps that judgment.” |
+| 0–7s | Point to Hanko. | “Tanaka has retired. AI prepares the edits; he stays on as an adviser for critical decisions.” |
 | 7–14s | **Use demo request** → **Analyze request**. | “Category seven: tax goes from eight to ten percent next April.” |
 | 14–22s | Point to impact. | “One tax paragraph, three referencing jobs, 1,214 affected customers. Those facts come from the files.” |
-| 22–28s | Show the diff. | “Devin wrote the edit. The compiled COBOL tests pass.” |
+| 22–28s | Show the diff. | “Devin prepared this edit. Codex independently compiled and tested it.” |
 | 28–37s | **Call the owner**; let the simulated transcript finish. | “The owner adds a condition: check rounding on invoices under one hundred yen.” |
 | 37–45s | Point to HELD, condition and diff hash. | “That condition keeps it held. The record ties the exact words to this diff. Nothing is deployed.” |
 
@@ -39,27 +44,27 @@ Pause while the result appears. Finish on the condition and its record, not on c
 
 ## Two-minute stage script
 
-**0:00–0:20 — problem**
-“Imagine a billing system that one person knows better than the documentation. An AI can propose a change, but the hard part is still getting that person's judgment—and keeping the reason behind it.”
+Read [PITCH.txt](PITCH.txt) for the complete, conversational script with call cues.
+Use [PITCH-NOTES.md](PITCH-NOTES.md) for the verified statistic, short answers to
+“why a human?” / “why not hire someone?” and the demo's claim boundaries.
 
-**0:20–0:35 — product and mode**
-“Hanko means the stamp. It checks the impact, presents the change, asks the named owner, and keeps the answer with the exact diff. This is fictional billing data with a simulated approval.”
-If showing an accepted live recording, replace the final sentence: “This is a recorded live rehearsal; I played the owner, and the business data is fictional.”
+- **0:00–0:35:** One retirement-risk statistic, then introduce Tanaka: retired
+  maintainer, retained adviser, consulted on critical changes while AI prepares edits.
+- **0:35–0:55:** Show the billing impact, Devin's edit, matching tests, and the
+  policy requiring the named owner's approval.
+- **0:55–1:40:** Let the voice conversation carry the demo. Give the condition;
+  wait for the final approval question before saying “Yes, I confirm.”
+- **1:40–2:00:** Show Tanaka's confirmation, condition, rationale and exact change.
+  Close on stepping back from daily work while passing context to the next team.
 
-**0:35–1:05 — show request, impact, proposal**
-“Category-seven tax changes from eight to ten percent. Hanko reads the source and customer fixture: one tax paragraph, three referencing jobs, 1,214 affected records. This summary is a template built from those facts. Devin wrote the edit. The compiled COBOL tests pass.”
-
-**1:05–1:40 — show decision and record**
-“The owner adds a condition: check rounding on small invoices. Hanko reads it back, then keeps the exact words, the reason, who was asked, the time, the transcript, and the diff hash. The change stays held until the condition is addressed.”
-
-**1:40–2:00 — close**
-“The useful result is the judgment attached to the code. Our real call reached voicemail, so Hanko recorded no answer and kept it held. A human's conditional approval through the app is the remaining live gate.”
-Once human approval is verified, replace the final sentence: “We can show the source, executed tests, and a human decision preserved with the exact proposal.”
+This is a target budget; time the actual rehearsal. Introduce a recording or
+simulation explicitly if using one. The rounding example demonstrates condition
+capture; tests already cover the 99-yen case, so do not claim discovery of a bug.
 
 ## Live conversation cue card
 
 For a future authorized human-approval rehearsal; do not reuse the completed voicemail attempt. Allow extra time for connection and processing.
-Introduce it once: “The billing data is fictional; this is a live agent conversation. I’m playing the system owner.”
+Introduce it once: “The billing data is fictional; this is a live agent conversation. I’m playing Tanaka, the retired maintainer retained as an adviser.”
 
 1. When asked whether now is okay: “Yes, go ahead.”
 2. When asked for a decision: “I approve, with one condition. Check the rounding on invoices under 100 yen. Small invoices always caused trouble in 2009.”

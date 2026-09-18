@@ -38,7 +38,7 @@ function guide(step, title, description, button) {
   guideStep = step; $('guide-position').textContent = `STEP ${['request','impact','change','call','ledger'].indexOf(step) + 1} OF 5 · YOUR NEXT STEP`; $('guide-title').textContent = title; $('guide-description').textContent = description; $('guide-next').textContent = button;
   document.querySelectorAll('.step-nav a').forEach(link => link.getAttribute('href') === `#${step}-panel` ? link.setAttribute('aria-current', 'step') : link.removeAttribute('aria-current'));
 }
-function reviewChange() { guide('change', 'Review the proposed edit', 'The tax rate changes from 8% to 10%. The green badge confirms the tests match this exact edit.', 'Prepare the call →'); focusStep('change-panel'); }
+function reviewChange() { guide('change', 'Review the proposed edit', 'The tests match this exact edit. The tax policy still requires a named owner to authorize the business change.', 'Prepare the call →'); focusStep('change-panel'); }
 function prepareCall() { guide('call', studio ? 'Prepare the owner conversation' : 'Ask the named owner to decide', mode === 'canned' ? 'This mode simulates the conversation. Start it below to see how the decision is recorded.' : 'Review the policy and impact, then press the call button when the owner is ready.', 'Go to conversation ↓'); focusStep('call-panel'); }
 const gate = () => {
   for (const id of ['submit', 'demo', 'speak', 'request-text', 'reset', 'reload', 'guide-next', 'new-rehearsal', 'rehearsal-mode']) $(id).disabled = busy || !mock;
@@ -93,8 +93,8 @@ function renderImpact() {
 }
 function renderPolicy() {
   $('policy-content').className = '';
-  $('policy-content').innerHTML = `<div class="policy-grid"><div class="policy-item"><span class="stat-label">Registered owner</span><div class="owner"><span class="owner-avatar" aria-hidden="true">田</span>${escape(policy.owner)}</div></div><div class="policy-item"><span class="stat-label">Hours · channel</span><p>${escape(policy.hours)}</p><p class="muted">${mode === 'canned' ? 'Simulated conversation · no phone call' : mode === 'browser' ? 'Browser voice conversation' : 'Phone · registered number'}</p></div><div class="policy-item wide"><span class="stat-label">Reason for call</span><p>${escape(policy.tripped.join('; ') || 'No approval-call rule was triggered.')}</p></div></div>`;
-  pill('call-pill', policy.requires_call ? 'Owner review required' : 'No call required', policy.requires_call ? 'conditional' : 'idle');
+  $('policy-content').innerHTML = `<div class="policy-grid"><div class="policy-item"><span class="stat-label">Named decision-maker</span><div class="owner"><span class="owner-avatar" aria-hidden="true">田</span>${escape(policy.owner)}</div></div><div class="policy-item"><span class="stat-label">Hours · channel</span><p>${escape(policy.hours)}</p><p class="muted">${mode === 'canned' ? 'Simulated conversation · no phone call' : mode === 'browser' ? 'Browser voice conversation' : 'Phone · registered number'}</p></div><div class="policy-item wide"><span class="stat-label">Policy requiring authorization</span><p>${escape(policy.tripped.join('; ') || 'No approval-call rule was triggered.')}</p></div></div>`;
+  pill('call-pill', policy.requires_call ? 'Authorization required' : 'No call required', policy.requires_call ? 'conditional' : 'idle');
 }
 function renderTranscript(lines = []) {
   $('transcript').hidden = !lines.length;
@@ -165,10 +165,10 @@ async function callOwner() {
     updateLedger(); notice('call-error', decision.error);
     $('decision-result').hidden = false;
     const note = decision.decision === 'conditional' ? `<span class="task-label">Open condition task</span>“${escape(conditionTask)}”` : decision.decision === 'no_answer' ? 'The confirmation could not be verified. This is not a rejection; review the transcript below.'  : decision.decision === 'rejected' ? escape(decision.condition_text || decision.rationale_quote || 'The owner rejected this change.') : 'Owner approval is complete. This demo records the decision; it does not deploy code.';
-    $('decision-result').innerHTML = `<div class="decision-card ${decision.decision === 'rejected' ? 'rejected' : ''}"><h3>${escape(eligibility)}${decision.channel === 'canned' ? ' · SIMULATED DECISION' : ''}</h3><p>${note}</p>${decision.confirmation_quote ? `<p class="confirmation-proof">✓ Final confirmation: “${escape(decision.confirmation_quote)}”</p>` : ''}${decision.rationale_quote ? `<p>Rationale: “${escape(decision.rationale_quote)}”</p>` : ''}<p class="mono">${escape(snapshot.request.id)} · diff ${fullHash === 'no-diff' ? 'unavailable' : fullHash.slice(0, 8)}</p></div>`;
+    $('decision-result').innerHTML = `<div class="decision-card ${decision.decision === 'rejected' ? 'rejected' : ''}"><h3>${escape(eligibility)}${decision.channel === 'canned' ? ' · SIMULATED DECISION' : ''}</h3><p>${note}</p><p>Named owner: <strong>${escape(snapshot.policy.owner)}</strong> · ${decision.channel === 'canned' ? 'Simulated conversation' : escape(decision.channel)}</p>${decision.confirmation_quote ? `<p class="confirmation-proof">✓ Final confirmation: “${escape(decision.confirmation_quote)}”</p>` : ''}${decision.rationale_quote ? `<p>Rationale: “${escape(decision.rationale_quote)}”</p>` : ''}<p class="mono">${escape(snapshot.request.id)} · diff ${fullHash === 'no-diff' ? 'unavailable' : fullHash.slice(0, 8)}</p></div>`;
     pill('call-pill', 'Decision recorded', 'done');
     $('call-status').textContent = decision.channel === 'canned' ? 'Simulated decision saved to the ledger.' : 'Decision saved to the ledger.';
-    guide('ledger', decision.decision === 'no_answer' ? 'Approval unconfirmed. Review the conversation.' : 'The decision is on the record', 'Review the outcome below. The ledger keeps the transcript, condition and exact proposed edit together.', 'View the record →');
+    guide('ledger', decision.decision === 'no_answer' ? 'Approval unconfirmed. Review the conversation.' : 'The decision is on the record', 'Review who decided, their explicit confirmation, the open condition and the exact code. Release remains held.', 'View the record →');
     advance('decision-result');
   } catch (error) {
     notice('call-error', `Approval could not complete: ${error.message}. The change remains held.`);

@@ -1,0 +1,66 @@
+HANKO — TWO-MINUTE DEMO
+
+Bracketed lines are cues, not spoken words.
+Target: 35 seconds opening, 20 seconds setup, 45 seconds call,
+20 seconds close. A live call can run longer; rehearse the timing.
+
+
+[OPENING]
+
+In a Japanese survey, three out of four IT staff said
+parts of their systems could stop working if a key veteran left.
+
+So imagine Tanaka-san.
+He maintained this billing system for years.
+He's now retired, but stays on as a technical adviser.
+
+AI takes on the code changes.
+But the current team doesn't have all the history behind them.
+
+Hanko brings Tanaka in when company policy flags
+a critical change in his area,
+and records his decision for the team.
+
+
+[SHOW THE REQUEST, IMPACT AND EDIT]
+
+Here's our fictional COBOL billing system.
+We're changing a tax rate from eight to ten percent
+for over twelve hundred customers.
+
+Devin prepared this edit ahead of the demo.
+Codex independently compiled and tested it.
+Our policy names Tanaka as the approver for tax changes.
+
+Hanko calls him through ElevenLabs. I'll play Tanaka.
+
+
+[START THE CALL — STOP NARRATING AND LET THE AGENT SPEAK]
+
+[When asked if now is a good time]
+
+Yes, go ahead.
+
+[After the agent explains the change and asks for a decision]
+
+I approve, with one condition.
+Check the rounding on invoices under 100 yen.
+Small invoices always caused trouble in 2009.
+
+[Wait for the readback AND final approval confirmation question]
+
+Yes, I confirm approval with that condition.
+
+[Let the call end. Point to the saved decision.]
+
+
+[CLOSE]
+
+Tanaka didn't have to write the code or return to daily maintenance.
+He gave a decision, a condition, and the reason behind it.
+
+Hanko keeps those with the exact change.
+The condition becomes a task, and release stays held.
+
+Experienced developers can step back.
+Their judgment stays available, and the next team gets the context.
