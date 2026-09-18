@@ -34,3 +34,14 @@ A spoken room/phone rehearsal is still needed to assess actual audio recognition
 and perceived timing; text simulations do not establish that acceptance.
 
 Configuration guidance: [ElevenLabs conversation flow](https://elevenlabs.io/docs/eleven-agents/customization/conversation-flow).
+
+## Explicit confirmation wording fix
+
+A later call said “I confirm approval” after the full confirmation question.
+The voice agent correctly approved it, but the app incorrectly required the
+literal prefix “yes”. The checker now accepts explicit confirmation phrases,
+including “I confirm approval”, “I confirm”, and “I approve the change”.
+Negations, questions, qualifications and changed conditions still do not confirm.
+Unconditional approval is now shown as APPROVED / NOT DEPLOYED, and the agent
+says owner approval is complete. Deployment is a separate action that this demo
+does not perform. Conditional approvals still retain their open condition.

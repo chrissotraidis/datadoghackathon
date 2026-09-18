@@ -93,7 +93,8 @@ export function confirmationQuote(rows) {
       if (waiting) quote = '';
     } else if (row.role === 'user') {
       if (waiting) {
-        quote = /^yes\b/i.test(text) && !/\b(no|not|but|unless|if|except|wait|actually|maybe)\b/i.test(text) ? text : '';
+        const affirmative = /^yes\b/i.test(text) || /^(?:i confirm(?: (?:my )?approval(?: of (?:this|the) change)?)?|i approve(?: (?:this|the) change)?|confirmed|approved)[.!]*$/i.test(text);
+        quote = affirmative && !/\b(no|not|but|unless|if|except|wait|actually|maybe|cannot|unsure)\b|don['’]t|can['’]t|\?/i.test(text) ? text : '';
         waiting = false;
       } else if (/\b(no|not|wait|actually|cancel|reject|changed my mind)\b/i.test(text)) quote = '';
     }
@@ -117,7 +118,7 @@ function extract(data) {
   if (['approved', 'conditional'].includes(decision) && !confirmation_quote) decision = 'no_answer';
   const responseTimes = (data.transcript || []).map(row => row.conversation_turn_metrics?.metrics?.convai_ttf_audio_since_silence?.elapsed_time).filter(value => Number.isFinite(value) && value >= 0);
   const interrupted = (data.transcript || []).filter(row => row.role === 'agent' && row.interrupted).length;
-  const reason = !userText.trim() ? 'No owner speech was captured.' : !confirmation_quote && ['approved','conditional'].includes(raw) ? 'The voice service heard approval, but a complete confirmation question followed by a clear yes was not captured. This is unconfirmed, not rejected.' : 'No clear final decision was captured. Review the transcript.';
+  const reason = !userText.trim() ? 'No owner speech was captured.' : !confirmation_quote && ['approved','conditional'].includes(raw) ? 'The voice service heard approval, but a complete confirmation question followed by an explicit confirmation was not captured. This is unconfirmed, not rejected.' : 'No clear final decision was captured. Review the transcript.';
   return { decision, condition_text, rationale_quote, confirmation_quote,
     diagnostics: { provider_decision: raw, recorded_decision: decision, max_response_delay_ms: responseTimes.length ? Math.round(Math.max(...responseTimes) * 1000) : null, interrupted_agent_turns: interrupted, confirmation_verified: Boolean(confirmation_quote) },
     error: decision === 'no_answer' ? reason : null };

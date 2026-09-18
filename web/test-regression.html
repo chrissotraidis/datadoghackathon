@@ -80,6 +80,15 @@ button.onclick = async () => {
     }
     const question = {role:'agent',message:'To confirm: you approve this change. Do you confirm approval of this change? Please say yes or no.'};
     for (const [label, rows, expected] of [
+      ['explicit confirmation: I confirm approval.',[{role:'agent',message:'You approve this change. Confirm approval?'},{role:'user',message:'I confirm approval.'}],true],
+      ['explicit confirmation: I confirm.',[{role:'agent',message:'You approve this change. Confirm approval?'},{role:'user',message:'I confirm.'}],true],
+      ['explicit confirmation: I approve the change.',[{role:'agent',message:'You approve this change. Confirm approval?'},{role:'user',message:'I approve the change.'}],true],
+      ['explicit confirmation: Confirmed.',[{role:'agent',message:'You approve this change. Confirm approval?'},{role:'user',message:'Confirmed.'}],true],
+      ['not confirmation: I do not confirm approval.',[{role:'agent',message:'Confirm approval?'},{role:'user',message:'I do not confirm approval.'}],false],
+      ['not confirmation: I confirm approval, but change the date.',[{role:'agent',message:'Confirm approval?'},{role:'user',message:'I confirm approval, but change the date.'}],false],
+      ['not confirmation: I confirm approval?',[{role:'agent',message:'Confirm approval?'},{role:'user',message:'I confirm approval?'}],false],
+      ['not confirmation: I approve if the tests pass.',[{role:'agent',message:'Confirm approval?'},{role:'user',message:'I approve if the tests pass.'}],false],
+      ['not confirmation: Yes, I cannot approve.',[{role:'agent',message:'Confirm approval?'},{role:'user',message:'Yes, I cannot approve.'}],false],
       ['short confirmation accepts yes',[{role:'agent',message:'You approve this change. Confirm approval?'},{role:'user',message:'Yes.'}],true],
       ['short question after interruption',[{role:'agent',message:'You approve this ch...',interrupted:true},{role:'user',message:'Yes.'},{role:'agent',message:'Confirm approval?'},{role:'user',message:'Yes, I confirm.'}],true],
       ['interrupted short question cannot confirm',[{role:'agent',message:'Confirm appro...',interrupted:true},{role:'user',message:'Yes.'}],false],
