@@ -38,6 +38,20 @@ jsDelivr as a fallback. Phone and canned modes do not load that dependency.
 - Saved records expand directly to show the transcript, rationale, conversation
   ID, exact diff and test/hash evidence. Print provides a standalone copy.
 
+## Appearance and preferences
+
+The header theme selector offers System, Light and Dark across all three pages.
+Settings at `/web/settings.html` also controls reduced motion, presenter cue
+visibility and automatic scrolling to completed impact/decision steps.
+Preferences persist in this browser and synchronize across its open tabs.
+Restore display defaults preserves all records and call locks.
+
+Settings can export Workspace and Studio records as JSON. The export selects
+only receipt fields; it does not include local calling credentials. Check
+connection reads agent and imported-number access without placing a call or
+changing the voice configuration. See [VOICE-RESEARCH.md](VOICE-RESEARCH.md)
+for the voice review and preserved baseline.
+
 ## Configuration
 
 `web/config.js` defines `window.HANKO` and is gitignored. The local demo key is

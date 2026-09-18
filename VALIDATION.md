@@ -101,3 +101,25 @@
   check; the original human call correctly fails that new rule.
 - Updated complete canned Studio flow passed with a visible final-confirmation
   quote, conditional-approval receipt, retained prior records and no console errors.
+
+## Takeover integration and Settings fixes · 18 September, 20:03 JST
+
+- Integrated the previously unfinished theme, preferences and Settings files.
+  Workspace now has the same next-step guidance as Studio, with an explanation
+  of policy-based owner escalation and section-by-section instructions.
+- Corrected Settings navigation markup that overlapped labels, and corrected
+  its Studio link from `?view=demo` to `./?view=demo`.
+- Browser checks: light/dark themes, mobile 390px Settings and Studio layouts,
+  preference persistence after reload, cross-tab theme/cue updates, restoring
+  display defaults while retaining a receipt, export action, and Settings →
+  Studio navigation. No application console warnings or errors were observed.
+- Full Studio simulated flow passed: source impact → exact tested edit →
+  conversation → conditional/HELD receipt with final yes and diff `3ae78ec9`.
+  The call button was disabled after recording the decision.
+- Existing isolated safety regressions: **55/55 PASS**. Impact suite:
+  **48/48 PASS**. Python fixture tests passed with GnuCOBOL.
+- Read-only connection check passed for agent access, extraction fields and
+  imported number. A separate GET comparison against the private pre-polish
+  snapshot confirmed `conversation_config` and `platform_settings` unchanged.
+- No outbound phone call or live microphone session was made in this pass.
+  Revised-agent spoken human acceptance remains separate and pending.
