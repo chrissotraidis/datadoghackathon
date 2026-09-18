@@ -16,6 +16,16 @@ The demonstration uses a fictional billing system and fictional customer data.
 Tanaka-san is the named owner in the scenario; a presenter role-plays that owner.
 It is not a production authorization or verified identity system.
 
+## Two spaces, one review engine
+
+Workspace (`/web/`) presents operational change review and retained decisions.
+Demo Studio (`/web/?view=demo`) adds an explicit walkthrough, channel selector,
+Tanaka-san cue card and a New rehearsal control. Studio uses a separate ledger.
+Each explicit rehearsal has a distinct review ID tied to the same CHG-0417
+proposal and hash. It receives one call at most; no automatic call or redial.
+Prior receipts are preserved. Workspace keeps its original per-change lock.
+These demonstration reviews do not grant production authorization.
+
 ## Fixed MVP
 
 | Step | Implemented behavior | Acceptance |
@@ -24,7 +34,7 @@ It is not a production authorization or verified identity system.
 | Impact | Exact-token search across the six loaded legacy source files; source definition and paragraph lines; distinct referencing JCL files; category count from CSV; history from the fixture metadata. | `CALC-TAX` lines 38–50; definition line 18; five references; three jobs; 1,214/3,000 records; history 2009-04-01. Missing evidence stays visibly unknown. |
 | Summary | Deterministic two-sentence template; optional Gemini can rewrite supplied facts with a timeout and fallback. | Facts and policy never depend on Gemini. Current verified demo uses the template. |
 | Change | Display the proposal diff and test output; snapshot diff and full SHA-256 before the approval attempt. | Proposal evidence refers to the same diff hash. Baseline remains on `main`; proposed code remains unmerged on `chg-0417`. |
-| Policy | Named owner; tax/rate/record triggers; live-call hours 09:00–20:00 JST; local one-call reservation. | Preflight rejection places no call. Duplicate attempts cannot place another live call. No automatic retries or backup calls. |
+| Policy | Named owner; tax/rate/record triggers; live-call hours 09:00–20:00 JST; local one-call reservation. | Preflight rejection places no call. Duplicate attempts cannot place another live call for the same review ID. No automatic retries or backup calls. |
 | Conversation | ElevenLabs phone or browser conversation, or clearly labeled canned simulation. Read back the condition before accepting confirmation. | Extract recognized decision, verbatim condition and rationale; end the conversation; ambiguity or missing confirmation stays held. |
 | Record | Local ledger saves request, facts, owner, time, channel, transcript, condition task, rationale, conversation ID, exact diff and hash. Printable copy includes the evidence. | Conditional means HELD with an open condition. Reloading a proposal cannot alter the recorded diff. Reset removes canned records and preserves live evidence/locks. |
 
@@ -41,7 +51,8 @@ no effective-date guard, and Hanko has no merge or deployment operation.
 | Local application flow | PASS | Impact → proposal → canned conditional decision → HELD ledger row; duplicate and mismatch checks; simulated reset preservation. This is not a human sign-off. |
 | ElevenLabs text behavior | PASS after fix | Initial rehearsal extracted correctly but did not end. A prompt-only closing fix was published; the second text rehearsal ended automatically and extracted `conditional`. |
 | Extraction fidelity | Verified with variation | Both rehearsals preserved the rounding condition and rationale verbatim. One `condition_text` included the rationale sentence too; keep the full transcript and separate rationale visible rather than claiming exact sentence segmentation. |
-| App → phone → human → ledger | PENDING | Presenter receives the call, confirms the readback, agent ends, app polls the same conversation and saves its exact decision/transcript/hash once. Dashboard text preview does not satisfy this gate. |
+| App → phone → voicemail → held ledger | PASS | Outbound reached voicemail (“Please leave a message after the tone.”); agent ended after no response. App polling completed and retained No answer / HELD, channel phone, transcript and full proposal SHA-256 `3ae78ec9e2eff58ec42ce5b63752779f3a4b92ccbf2103e20e51cd9e0103dee4`. No human approval. |
+| Spoken human conditional approval → ledger | PENDING | Presenter hears the impact and confirms the conditional readback; agent ends; app saves the completed conditional decision/transcript against the same diff. Voicemail and dashboard text tests do not satisfy this gate. |
 | Browser voice fallback | PENDING | Microphone session through the app, confirmed decision extraction and automatic end. |
 | Speech request / Gemini | PENDING, optional | Browser speech recognition and a live Gemini response have not been accepted. Typed input and template summary are the verified defaults. |
 | Show readiness | PENDING | Time one full rehearsal; record a backup; verify the visible mode, proposal hash and retained receipt; submit the hackathon entry separately. |
@@ -59,16 +70,20 @@ No microphone or outbound phone call was used for that acceptance.
   date, named owner persona and the scripted condition.
 - **Simulated approval:** canned mode. **Live model but synthetic participation:**
   automated dashboard text rehearsal. Neither establishes spoken human approval.
-- **Pending live acceptance:** phone and browser voice through the application.
+- **Verified live phone path:** voicemail reached; polling and transcript/diff
+  recording completed safely as No answer / HELD. No human approved the change.
+- **Pending live acceptance:** spoken human conditional approval through the
+  application, and the separate browser microphone path.
 - **Absent:** deployment, future-date enforcement in COBOL, automatic condition
   resolution, retries, backup-owner escalation, cross-device locks, secure
   server-side secrets, identity verification and tamper-proof audit storage.
 
 ## Finish without widening scope
 
-1. Complete one real approval rehearsal inside the owner's hours, capture the
-   result, and retain it. The planned 20:00 stage slot is outside the current
-   live-call window; use a saved live receipt/video or a labeled simulation.
+1. Preserve the real No answer / HELD receipt and its call lock. Spoken human
+   approval remains a future acceptance gate, not grounds to retry this change.
+   The planned 20:00 stage slot is outside the current live-call window; show
+   the saved receipt/video or a labeled simulation.
 2. Show matched test evidence only when its SHA-256 equals the displayed diff;
    a generic passing JSON flag is not proof for a newly reloaded proposal.
 3. Keep the final condition, HELD state, channel and short diff hash together

@@ -7,9 +7,9 @@
   <meta name="description" content="Human judgment, on the record. Hanko binds a spoken approval to the exact change.">
   <title>Hanko — The stamp for agents</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23d23b3b'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='42' fill='white'%3E判%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css">
-  <script src="config.js?v=20260918-2"></script>
-  <script type="module" src="app.js?v=20260918-2"></script>
+  <link rel="stylesheet" href="styles.css?v=20260918-6">
+  <script src="config.js?v=20260918-6"></script>
+  <script type="module" src="app.js?v=20260918-6"></script>
 </head>
 <body>
   <div class="shell">
@@ -17,32 +17,41 @@
       <a class="brand" href="./" aria-label="Hanko home"><span class="brand-stamp" aria-hidden="true">判</span><span>HANKO<small>The stamp for agents</small></span></a>
       <div class="session-meta"><span class="environment">LEGACY CHANGE CONTROL</span><span id="counter">AI calls for this change: <b>0</b></span></div>
     </header>
+    <nav class="space-nav" aria-label="Dashboard spaces"><a id="workspace-link" href="./"><span aria-hidden="true">▤</span> Workspace<small>Changes &amp; decisions</small></a><a id="demo-link" href="?view=demo"><span aria-hidden="true">▷</span> Demo Studio<small>Guided hackathon rehearsal</small></a></nav>
     <main>
-      <div class="intro"><div><p class="eyebrow">THE WORK IS AUTOMATED. THE JUDGMENT IS HUMAN.</p><h1>A change. A conversation.<br><span>A record that stays.</span></h1><p class="intro-copy">The agent makes the change. The person who knows the system<br class="desktop-break"> decides whether it can move forward.</p></div><div class="hero-seal" aria-hidden="true"><span>判子</span><small>HUMAN IN THE LOOP</small></div></div>
+      <div class="intro demo-only"><div><p class="eyebrow">THE WORK IS AUTOMATED. THE JUDGMENT IS HUMAN.</p><h1>A tax change. A phone call.<br><span>A decision on record.</span></h1><p class="intro-copy">Walk through one billing change. Hanko calls the system owner.<br class="desktop-break"> You play Tanaka-san and give the decision.</p></div><div class="hero-seal" aria-hidden="true"><span>判子</span><small>HUMAN IN THE LOOP</small></div></div>
+      <div class="workspace-intro workspace-only"><div><p class="eyebrow">BILLING SYSTEM · CHANGE CONTROL</p><h1>Review the change.<br><span>Keep the judgment.</span></h1><p class="intro-copy">Verified impact, tested proposals and owner decisions in one place.</p></div><div class="workspace-status"><span class="status-dot"></span> Local workspace</div></div>
+      <div class="studio-controls demo-only"><div><label for="rehearsal-mode">Rehearsal channel</label><select id="rehearsal-mode"><option value="phone">Live phone call</option><option value="canned">Simulated conversation</option><option value="browser">Browser microphone</option></select></div><div class="studio-run"><span id="rehearsal-label">New rehearsal</span><button id="new-rehearsal" class="secondary" type="button" disabled>New rehearsal +</button></div><p>Each rehearsal keeps its own receipt. A new rehearsal never starts a call automatically.</p></div>
       <div class="mode-banner" id="mode-banner"><span class="status-dot"></span><strong id="mode-label">Loading workspace</strong><span id="mode-description">Preparing the legacy system.</span></div>
       <nav class="step-nav" aria-label="Change review steps"><a href="#request-panel"><span>01</span> Request</a><a href="#impact-panel"><span>02</span> Impact</a><a href="#change-panel"><span>03</span> Change</a><a href="#call-panel"><span>04</span> Approval</a><a href="#ledger-panel"><span>05</span> Ledger</a></nav>
+      <div class="demo-guide demo-only" aria-live="polite"><div><span class="guide-kicker">YOUR NEXT STEP</span><h2 id="guide-title">Start with the example</h2><p id="guide-description">Category 7 tax rises from 8% to 10% next April. Load the request to begin.</p></div><button id="guide-next" class="secondary" type="button" disabled>Load example <span aria-hidden="true">→</span></button></div>
       <p id="global-error" class="notice" role="status" hidden></p>
       <section class="panel" id="request-panel" aria-labelledby="request-title">
-        <div class="panel-heading"><h2 id="request-title"><span class="step">01</span>Request</h2><span id="request-pill" class="pill idle">Ready</span></div>
+        <div class="panel-heading"><h2 id="request-title"><span class="step">01</span>Describe the change</h2><span id="request-pill" class="pill idle">Ready</span></div>
+        <p class="section-intro demo-only">One example, start to finish: change category 7 tax from <strong>8% to 10%</strong>, effective <strong>1 April 2027</strong>.</p>
         <form id="request-form"><label for="request-text" class="field-label">What needs to change?</label><textarea id="request-text" rows="3" placeholder="Say or type the change" required></textarea><div class="request-actions"><div class="button-group"><button id="speak" type="button" class="secondary" hidden><span aria-hidden="true">◉</span> Speak</button><button id="demo" type="button" class="text-button">Use demo request <kbd>1</kbd></button></div><button id="submit" type="submit" class="primary" disabled>Analyze request <span aria-hidden="true">↗</span></button></div><p id="speech-status" class="muted" role="status"></p></form>
         <div id="request-result" hidden></div>
       </section>
       <section class="panel" id="impact-panel" aria-labelledby="impact-title">
-        <div class="panel-heading"><h2 id="impact-title"><span class="step">02</span>Impact</h2><span id="impact-pill" class="pill idle">Waiting for request</span></div>
-        <div id="impact-content" class="empty-state"><span class="empty-icon" aria-hidden="true">⌁</span><p>Know the reach before making the change.<small>Source references, affected customers, and the history behind them.</small></p></div>
+        <div class="panel-heading"><h2 id="impact-title"><span class="step">02</span>Check the impact</h2><span id="impact-pill" class="pill idle">Waiting for request</span></div>
+        <div id="impact-content" class="empty-state"><span class="empty-icon" aria-hidden="true">⌁</span><p>Know the reach before making the change.<small>Source references, affected customers, and the history behind them.</small></p></div><div class="step-action demo-only"><button id="review-change" class="secondary" type="button" disabled>Next: review the edit <span aria-hidden="true">→</span></button></div>
       </section>
       <section class="panel" id="change-panel" aria-labelledby="change-title">
-        <div class="panel-heading"><h2 id="change-title"><span class="step">03</span>Change</h2><div class="heading-actions"><button id="reload" class="text-button" type="button">↻ Reload</button><span id="change-pill" class="pill idle">Loading</span></div></div>
-        <div id="change-content" class="empty-state"><p>Loading the proposed change.</p></div>
+        <div class="panel-heading"><h2 id="change-title"><span class="step">03</span>Review the proposed edit</h2><div class="heading-actions"><button id="reload" class="text-button" type="button">↻ Reload</button><span id="change-pill" class="pill idle">Loading</span></div></div>
+        <p class="section-intro">The proposed edit is ready below. Check the passing tests, then prepare the owner conversation.</p>
+        <div id="change-content" class="empty-state"><p>Loading the proposed change.</p></div><div class="step-action demo-only"><button id="prepare-call" class="secondary" type="button" disabled>Next: prepare the call <span aria-hidden="true">→</span></button></div>
       </section>
       <section class="panel" id="call-panel" aria-labelledby="call-title">
-        <div class="panel-heading"><h2 id="call-title"><span class="step">04</span>Approval call</h2><span id="call-pill" class="pill idle">Awaiting impact</span></div>
+        <div class="panel-heading"><h2 id="call-title"><span class="step">04</span>Call Tanaka-san</h2><span id="call-pill" class="pill idle">Awaiting impact</span></div>
+        <p id="role-instructions" class="section-intro demo-only">You are Tanaka-san, the person who knows this billing system. Keep your phone nearby and use the three responses below.</p>
         <div id="policy-content" class="empty-state"><span class="empty-icon" aria-hidden="true">↗</span><p>The right person. The actual context.<small>Policy names the owner and decides when a conversation is required.</small></p></div>
-        <div class="call-action"><button id="call" class="primary" type="button" disabled><span aria-hidden="true">↗</span> Call the owner</button><span id="call-status" class="muted" role="status" aria-live="polite">One call per change. Every word on the record.</span></div>
+        <div class="rehearsal-script demo-only" id="owner-script"><div class="script-heading"><span class="guide-kicker">YOUR ROLE · TANAKA-SAN</span><span class="script-label">Read aloud when asked</span></div><ol><li><div><span>Hanko asks if now is a good time</span><p>“Yes, go ahead.”</p></div></li><li><div><span>Hanko explains the change and asks for your decision</span><p>“I approve, with one condition. Check the rounding on invoices under 100 yen. Small invoices always caused trouble in 2009.”</p></div></li><li><div><span>Hanko reads your condition back</span><p>“Yes, that is right.”</p></div></li></ol><p class="script-result">Then wait for Hanko to say goodbye. Your condition should appear below, with the change <strong>HELD</strong>.</p></div>
+        <div class="call-action"><button id="call" class="primary" type="button" disabled><span aria-hidden="true">↗</span> Call my phone</button><span id="call-status" class="muted" role="status" aria-live="polite">One call per change. Every word on the record.</span></div>
         <p id="call-error" class="notice" role="status" hidden></p><div id="transcript" class="transcript" aria-live="polite" aria-label="Approval transcript" hidden></div><div id="decision-result" hidden></div>
       </section>
       <section class="panel ledger-panel" id="ledger-panel" aria-labelledby="ledger-title">
-        <div class="panel-heading"><h2 id="ledger-title"><span class="step">05</span>Ledger</h2><div class="heading-actions"><button id="print" class="text-button" type="button">Print ↗</button><span id="ledger-pill" class="pill idle">No decisions</span></div></div>
+        <div class="panel-heading"><h2 id="ledger-title"><span class="step">05</span>Keep the decision</h2><div class="heading-actions"><button id="print" class="text-button" type="button">Print ↗</button><span id="ledger-pill" class="pill idle">No decisions</span></div></div>
+        <p class="section-intro">The exact words stay with the proposed change. A condition or unanswered call keeps it on hold.</p>
         <div id="ledger-content"></div>
         <div class="ledger-footer"><span>Spoken judgment, bound to the exact diff.</span><button id="reset" class="text-button" type="button" title="Clear simulated records only; live decisions and call locks are preserved">Reset demo <kbd>R</kbd></button></div>
       </section>

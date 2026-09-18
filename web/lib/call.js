@@ -46,7 +46,7 @@ function validateEvidence(policy, impact) {
 
 async function reserve(id, live) {
   const take = () => {
-    if (alreadyCalled(id)) throw new Error('Policy: one call per change. Reset to call again.');
+    if (alreadyCalled(id)) throw new Error('Policy: one call per change. This change already has a call attempt.');
     const token = `${new Date().toISOString()}:${Math.random().toString(36).slice(2)}`;
     localStorage.setItem(PREFIX + id, token);
     activeCalls.add(id);
@@ -92,6 +92,7 @@ function extract(data) {
   if (decision === 'approved' && condition_text) decision = 'conditional';
   if (decision === 'conditional' && !condition_text) decision = 'no_answer';
   const userText = transcript(data.transcript).filter(row => row.role === 'user').map(row => row.text).join(' ');
+  if (!userText.trim()) decision = 'no_answer'; // Analysis alone cannot establish an owner's decision.
   if (decision === 'approved' && /\b(not approved|do not approve|don't approve|cannot approve|can't approve|unsure|not sure|i reject)\b/i.test(userText)) decision = 'no_answer';
   return { decision, condition_text, rationale_quote,
     error: decision === 'no_answer' ? 'No unambiguous approval decision was captured. Change is on hold.' : null };

@@ -54,11 +54,11 @@ button.onclick = async () => {
     report('canned condition and four transcript lines', results.some(r => r.decision === 'conditional' && r.transcript.length === 4));
     const invalid = await requestApproval({...args, request:{...request,id:'REG-PREFLIGHT'},config:{demoMode:'phone'}});
     report('preflight does not own attempt or lock', invalid.attempted === false && !alreadyCalled('REG-PREFLIGHT'));
-    let raw = 'approved', condition = '', calls = 0;
+    let raw = 'approved', condition = '', calls = 0, conversationTranscript = [];
     window.fetch = async (url, options) => {
       calls++;
       return new Response(JSON.stringify(options.method === 'POST' ? {success:true,conversation_id:'regression-mock'} : {
-        status:'done',transcript:[{role:'user',message:'Fixture owner response'}],
+        status:'done',transcript:conversationTranscript,
         analysis:{data_collection_results:{decision:{value:raw},condition_text:{value:condition}}}
       }),{status:200,headers:{'Content-Type':'application/json'}});
     };
@@ -66,7 +66,16 @@ button.onclick = async () => {
     let sequence = 0;
     const mockedCall = async extra => requestApproval({...args,config:phone,request:{...request,id:'REG-PHONE-'+sequence++},...extra});
     for (const [value, text, expected] of [['not approved','','no_answer'],['approved','','approved'],['approved','Check rounding','conditional'],['conditional','','no_answer'],['maybe approved','','no_answer'],['rejected','Too risky','rejected']]) {
+      conversationTranscript = [{role:'user',message:value==='rejected' ? 'I reject this change. Too risky.' : value==='approved' ? `I approve this change.${text ? ' With a condition: '+text : ''}` : value}];
       raw=value;condition=text;const result=await mockedCall();report(`decision ${JSON.stringify(value)} / ${JSON.stringify(text)}`,result.decision===expected&&result.attempted===true);
+    }
+    for (const [label, rows] of [['absent transcript',undefined],['empty transcript',[]],['agent-only voicemail',[{role:'agent',message:'Are you there? Chris will follow up.'}]],['blank owner speech',[{role:'user',message:'   '}]]]) {
+      conversationTranscript=rows;
+      for (const value of ['approved','conditional','rejected']) {
+        raw=value;condition=value==='conditional'?'Check rounding':'';
+        const result=await mockedCall();
+        report(`${label} cannot establish ${value}`,result.decision==='no_answer'&&Boolean(result.error)&&result.attempted===true&&result.conversation_id==='regression-mock'&&alreadyCalled('REG-PHONE-'+(sequence-1)));
+      }
     }
     const before = calls;
     const noPolicy = await mockedCall({policy:{...policy,requires_call:false}});
@@ -85,6 +94,12 @@ button.onclick = async () => {
     ledger.reset();
     report('demo reset preserves live evidence',ledger.all().length===1&&ledger.all()[0].change_id==='REG-LIVE');
     report('ledger rejects duplicate change',ledger.append({change_id:'REG-LIVE',channel:'canned'})===false);
+    ledger.useDemoLedger();
+    report('Demo Studio starts with separate evidence',ledger.all().length===0);
+    ledger.append({change_id:'DEMO-REG-1',proposal_id:'CHG-0417',space:'demo',channel:'phone',decision:'no_answer'});
+    report('Demo Studio cannot overwrite Workspace receipt',JSON.parse(memory.get('hanko.ledger')).length===1&&JSON.parse(memory.get('hanko.ledger'))[0].change_id==='REG-LIVE'&&ledger.all()[0].change_id==='DEMO-REG-1');
+    ledger.append({change_id:'DEMO-REG-2',channel:'canned',decision:'conditional'});ledger.reset();
+    report('Demo Studio reset retains its live rehearsal',ledger.all().length===1&&ledger.all()[0].change_id==='DEMO-REG-1');
   } catch (error) { report('harness completed',false,error.message); }
   finally {
     window.fetch=originalFetch;

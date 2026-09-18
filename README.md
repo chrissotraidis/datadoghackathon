@@ -23,6 +23,21 @@ No npm, bundler, framework, or application backend. Modules load static files.
 Only browser voice mode dynamically loads the ElevenLabs SDK from esm.sh, with
 jsDelivr as a fallback. Phone and canned modes do not load that dependency.
 
+## Two dashboard spaces
+
+- **Workspace** at `/web/` is the product view: requests, source impact, proposed
+  edits, owner approval and saved decisions.
+- **Demo Studio** at `/web/?view=demo` guides the hackathon rehearsal. Choose a
+  channel, load/analyze the example, review its impact and edit, then use the
+  three Tanaka-san responses beside the call button. Only that button dials.
+- **New rehearsal** prepares a new labeled review of the same fixed proposal.
+  It never calls automatically. Studio receipts use a separate ledger and keep
+  earlier rehearsals; the original Workspace receipt stays untouched. Each live
+  rehearsal has its own one-call lock. Changing the Studio channel also prepares
+  a new rehearsal and preserves previous receipts.
+- Saved records expand directly to show the transcript, rationale, conversation
+  ID, exact diff and test/hash evidence. Print provides a standalone copy.
+
 ## Configuration
 
 `web/config.js` defines `window.HANKO` and is gitignored. The local demo key is

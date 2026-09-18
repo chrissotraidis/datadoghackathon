@@ -1,15 +1,30 @@
-import { loadMock } from './lib/mockdata.js?v=20260918-2';
-import { parseRequest, analyze, checkPolicy } from './lib/impact.js?v=20260918-2';
-import { requestApproval, alreadyCalled } from './lib/call.js?v=20260918-2';
-import * as ledger from './lib/ledger.js?v=20260918-2';
+import { loadMock } from './lib/mockdata.js?v=20260918-6';
+import { parseRequest, analyze, checkPolicy } from './lib/impact.js?v=20260918-6';
+import { requestApproval, alreadyCalled } from './lib/call.js?v=20260918-6';
+import * as ledger from './lib/ledger.js?v=20260918-6';
 
 const $ = id => document.getElementById(id);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const DEMO = 'From April, consumption tax on category 7 goes from 8 to 10 percent.';
 const config = { demoMode: 'canned', ...(window.HANKO || {}) };
-const mode = ['phone', 'browser', 'canned'].includes(config.demoMode) ? config.demoMode : 'canned';
+let mode = ['phone', 'browser', 'canned'].includes(config.demoMode) ? config.demoMode : 'canned';
 config.demoMode = mode;
-let mock, request, impact, policy, busy = false, calls = 0, recognition;
+const studio = new URLSearchParams(location.search).get('view') === 'demo';
+document.body.dataset.view = studio ? 'demo' : 'workspace';
+$(studio ? 'demo-link' : 'workspace-link').setAttribute('aria-current', 'page');
+if (studio) ledger.useDemoLedger();
+let rehearsalId;
+function getRehearsal(fresh = false) {
+  let id = fresh ? '' : localStorage.getItem('hanko.demo.active');
+  if (!/^DEMO-0417-[A-F0-9]{6}$/.test(id || '')) {
+    id = `DEMO-0417-${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
+    localStorage.setItem('hanko.demo.active', id);
+  }
+  rehearsalId = id; $('rehearsal-label').textContent = id;
+}
+if (studio) { getRehearsal(); const savedMode = localStorage.getItem('hanko.demo.mode'); if (['phone', 'browser', 'canned'].includes(savedMode)) { mode = savedMode; config.demoMode = mode; } }
+$('rehearsal-mode').value = mode;
+let mock, request, impact, policy, busy = false, calls = 0, recognition, guideStep = "request";
 const notice = (id, message = '') => { $(id).textContent = message; $(id).hidden = !message; };
 const pill = (id, text, kind = 'idle') => { $(id).textContent = text; $(id).className = `pill ${kind}`; };
 const count = () => { $('counter').innerHTML = `AI calls for this change: <b>${calls}</b>`; };
@@ -17,9 +32,16 @@ const focusStep = id => $(id).scrollIntoView({ behavior: matchMedia('(prefers-re
 const hashDiff = async diff => diff ? Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(diff))), b => b.toString(16).padStart(2, '0')).join('') : 'no-diff';
 const impactReady = () => impact?.definition?.line > 0 && impact?.paragraph?.start_line > 0 && impact?.paragraph?.name !== 'unknown' && impact?.last_changed?.date !== 'unknown' && impact?.affected_records > 0 && impact?.total_records >= impact?.affected_records && policy?.owner !== 'unknown';
 const matchesProposal = () => !request?.parsed_with_defaults && request?.category === 7 && request.field === 'TAX-RATE-CAT7' && Number(request.from) === .08 && Number(request.to) === .10 && request.effective === '2027-04-01';
+function guide(step, title, description, button) {
+  guideStep = step; $('guide-title').textContent = title; $('guide-description').textContent = description; $('guide-next').textContent = button;
+  document.querySelectorAll('.step-nav a').forEach(link => link.getAttribute('href') === `#${step}-panel` ? link.setAttribute('aria-current', 'step') : link.removeAttribute('aria-current'));
+}
+function reviewChange() { guide('change', 'Review the proposed edit', 'The tax rate changes from 8% to 10%. The green badge confirms the tests match this exact edit.', 'Prepare the call →'); focusStep('change-panel'); }
+function prepareCall() { guide('call', 'You are Tanaka-san', mode === 'canned' ? 'This mode simulates the conversation. Read the owner script, then start the simulation.' : 'Read the three responses below. When you are ready to answer, press the call button.', 'Read my script ↓'); focusStep('call-panel'); }
 const gate = () => {
-  for (const id of ['submit', 'demo', 'speak', 'request-text', 'reset', 'reload']) $(id).disabled = busy || !mock;
-  $('call').disabled = busy || !policy || !request || !policy.requires_call || !matchesProposal() || !impactReady() || !mock?.evidenceMatched;
+  for (const id of ['submit', 'demo', 'speak', 'request-text', 'reset', 'reload', 'guide-next', 'new-rehearsal', 'rehearsal-mode']) $(id).disabled = busy || !mock;
+  for (const id of ['review-change', 'prepare-call']) $(id).disabled = busy || !policy || !mock?.evidenceMatched;
+  $('call').disabled = busy || (request && (alreadyCalled(request.id) || ledger.all().some(row => row.change_id === request.id))) || !policy || !request || !policy.requires_call || !matchesProposal() || !impactReady() || !mock?.evidenceMatched;
 };
 function updateLedger() {
   ledger.render($('ledger-content'));
@@ -37,8 +59,8 @@ function invalidate() {
   $('impact-content').innerHTML = '<div class="empty-state"><p>Submit the request to compute its impact.</p></div>';
   $('policy-content').innerHTML = '<div class="empty-state"><p>Analyze the request to check its approval policy.</p></div>';
   $('transcript').hidden = $('decision-result').hidden = true;
-  $('call-status').textContent = 'One call per change. Every word on the record.';
-  notice('call-error'); gate();
+  $('call-status').textContent = studio ? 'One call per rehearsal. Press New rehearsal to prepare another; earlier receipts stay saved.' : 'One call per change. Every word on the record.';
+  notice('call-error'); guide('request', 'Start with the example', 'Load the billing change, then analyze its impact. You will play the system owner when Hanko calls.', 'Load example →'); gate();
 }
 async function renderChange() {
   $('change-content').className = '';
@@ -81,6 +103,7 @@ function status(name, data) {
   if (name === 'transcript') return renderTranscript(data);
   const labels = { policy: 'Checking policy', dialing: mode === 'canned' ? 'Starting simulated conversation' : `Dialing ${policy.owner}`, ringing: mode === 'canned' ? 'Simulated ringing' : 'Ringing', in_call: 'In conversation', processing: 'Extracting decision', done: 'Conversation finished' };
   const label = labels[name] || 'Approval in progress';
+  if (['dialing', 'ringing', 'in_call'].includes(name)) guide('call', mode === 'phone' ? 'Answer your phone as Tanaka-san' : 'Follow the owner script', 'Listen to Hanko, give the rounding condition, then confirm the readback. Wait for the recorded decision.', 'Conversation in progress');
   $('call-status').textContent = label;
   pill('call-pill', label, name === 'done' ? 'done' : 'working');
 }
@@ -91,6 +114,7 @@ async function submit(event) {
   $('transcript').hidden = $('decision-result').hidden = true;
   try {
     request = parseRequest($('request-text').value.trim());
+    if (studio) { request.proposal_id = request.id; request.id = rehearsalId; }
     policy = null; renderRequest();
     pill('request-pill', 'Parsed', 'done'); pill('impact-pill', 'Analyzing source', 'working');
     impact = await analyze(request, mock, config.geminiKey);
@@ -100,8 +124,9 @@ async function submit(event) {
     if (!matchesProposal()) notice('call-error', 'This request does not match the available CHG-0417 proposal: category 7, 8% → 10%, effective 2027-04-01. Approval is held; use the demo request to review this diff.');
     calls = (impact.summary_source === 'gemini' ? 1 : 0) + (alreadyCalled(request.id) || ledger.all().some(row => row.change_id === request.id) ? 1 : 0); count();
     pill('impact-pill', 'Verified from source', 'done');
+    guide('impact', 'Check the reach of this change', 'Review the paragraph, three referencing jobs and 1,214 affected records. Then inspect the proposed edit.', 'Review the edit →');
     focusStep('impact-panel');
-    if (alreadyCalled(request.id)) $('call-status').textContent = 'Already contacted for this change. One call per change.';
+    if (alreadyCalled(request.id)) { $('call-status').textContent = 'A call is already recorded for this change. View the saved decision below.'; guide('ledger', 'This call is already on the record', 'The previous result and its exact words are preserved. Open the ledger to review it.', 'View saved decision →'); }
   } catch (error) {
     policy = null; pill('impact-pill', 'Unable to analyze', 'failed');
     notice('global-error', `Could not analyze this request: ${error.message}`);
@@ -131,7 +156,7 @@ async function callOwner() {
     const evidenceMatched = Boolean(diff) && snapshot.testsPassed && snapshot.testHash === fullHash;
     const eligibility = decision.decision === 'approved' ? 'APPROVED · RELEASE HELD' : decision.decision === 'rejected' ? 'REJECTED' : 'HELD';
     const conditionTask = decision.decision === 'conditional' ? decision.condition_text || 'Clarify and satisfy the owner’s condition before further approval.' : '';
-    const saved = ledger.append({ change_id: snapshot.request.id, request_text: snapshot.request.text, facts_summary: `${snapshot.impact.paragraph.name}; ${snapshot.impact.jobs.length} jobs; ${snapshot.impact.affected_records} of ${snapshot.impact.total_records} customers; last changed ${snapshot.impact.last_changed.date}. ${snapshot.impact.summary}`, diff_hash: fullHash === 'no-diff' ? fullHash : fullHash.slice(0, 8), decision: decision.decision, condition_text: decision.condition_text, approver: snapshot.policy.owner, approved_at: decision.ended_at, conversation_id: decision.conversation_id, channel: decision.channel, transcript: decision.transcript, rationale_quote: decision.rationale_quote, started_at: decision.started_at, error: decision.error, diff_sha256: fullHash, diff_snapshot: diff, eligibility, condition_task: conditionTask, test_evidence_matched: evidenceMatched, attempted: decision.attempted });
+    const saved = ledger.append({ change_id: snapshot.request.id, proposal_id: snapshot.request.proposal_id || snapshot.request.id, space: studio ? 'demo' : 'workspace', request_text: snapshot.request.text, facts_summary: `${snapshot.impact.paragraph.name}; ${snapshot.impact.jobs.length} jobs; ${snapshot.impact.affected_records} of ${snapshot.impact.total_records} customers; last changed ${snapshot.impact.last_changed.date}. ${snapshot.impact.summary}`, diff_hash: fullHash === 'no-diff' ? fullHash : fullHash.slice(0, 8), decision: decision.decision, condition_text: decision.condition_text, approver: snapshot.policy.owner, approved_at: decision.ended_at, conversation_id: decision.conversation_id, channel: decision.channel, transcript: decision.transcript, rationale_quote: decision.rationale_quote, started_at: decision.started_at, error: decision.error, diff_sha256: fullHash, diff_snapshot: diff, eligibility, condition_task: conditionTask, test_evidence_matched: evidenceMatched, attempted: decision.attempted });
     if (!saved) throw new Error('An existing ledger decision was preserved; this result did not replace it');
     updateLedger(); notice('call-error', decision.error);
     $('decision-result').hidden = false;
@@ -139,6 +164,7 @@ async function callOwner() {
     $('decision-result').innerHTML = `<div class="decision-card ${decision.decision === 'rejected' ? 'rejected' : ''}"><h3>${escape(eligibility)}${decision.channel === 'canned' ? ' · SIMULATED DECISION' : ''}</h3><p>${note}</p>${decision.rationale_quote ? `<p>Rationale: “${escape(decision.rationale_quote)}”</p>` : ''}<p class="mono">${escape(snapshot.request.id)} · diff ${fullHash === 'no-diff' ? 'unavailable' : fullHash.slice(0, 8)}</p></div>`;
     pill('call-pill', 'Decision recorded', 'done');
     $('call-status').textContent = decision.channel === 'canned' ? 'Simulated decision saved to the ledger.' : 'Decision saved to the ledger.';
+    guide('ledger', decision.decision === 'no_answer' ? 'No answer. The change stays held.' : 'The decision is on the record', 'Review the outcome below. The ledger keeps the transcript, condition and exact proposed edit together.', 'View the record →');
     focusStep('decision-result');
   } catch (error) {
     notice('call-error', `Approval could not complete: ${error.message}. The change remains held.`);
@@ -166,7 +192,27 @@ function resetDemo() {
     notice('global-error'); $('speech-status').textContent = ''; $('request-text').focus();
   } catch { notice('global-error', 'Demo reset could not clear local storage. Existing call locks remain in effect.'); }
 }
-function fillDemo() { if (!busy) { $('request-text').value = DEMO; invalidate(); $('request-text').focus(); } }
+function fillDemo() { if (!busy) { $('request-text').value = DEMO; invalidate(); guide('request', 'Analyze the example request', 'The request is ready. Hanko will compute the impact from the billing files before any call.', 'Analyze request →'); focusStep('request-panel'); $('request-text').focus(); } }
+$('new-rehearsal').addEventListener('click', () => {
+  if (busy) return;
+  getRehearsal(true); calls = 0; count(); fillDemo();
+  notice('global-error'); guide('request', 'New rehearsal ready', 'Earlier receipts are preserved. Analyze this example, then start the call when you are ready.', 'Analyze request →');
+});
+$('rehearsal-mode').addEventListener('change', () => {
+  if (busy || !studio) return;
+  mode = $('rehearsal-mode').value; config.demoMode = mode; localStorage.setItem('hanko.demo.mode', mode); displayMode();
+  getRehearsal(true); calls = 0; count(); fillDemo();
+});
+window.addEventListener('beforeunload', event => { if (busy) { event.preventDefault(); event.returnValue = ''; } });
+$('guide-next').addEventListener('click', () => {
+  if (busy) return;
+  if (guideStep === 'request') $('request-text').value.trim() ? $('request-form').requestSubmit() : fillDemo();
+  else if (guideStep === 'impact') reviewChange();
+  else if (guideStep === 'change') prepareCall();
+  else focusStep(guideStep === 'call' ? 'owner-script' : 'ledger-panel');
+});
+$('review-change').addEventListener('click', reviewChange);
+$('prepare-call').addEventListener('click', prepareCall);
 $('request-form').addEventListener('submit', submit);
 $('request-text').addEventListener('input', invalidate);
 $('demo').addEventListener('click', fillDemo);
@@ -193,8 +239,17 @@ if (Speech) {
     try { recognition.start(); } catch { $('speech-status').textContent = 'Could not start voice input. You can type the request.'; }
   });
 }
+function displayMode() {
+$('rehearsal-mode').value = mode;
+$('role-instructions').textContent = mode === 'canned' ? 'Watch a simulated owner conversation. The cue card below is your script for a live rehearsal; no phone call is placed in this mode.' : mode === 'browser' ? 'You are Tanaka-san. Use your browser microphone and give the three responses below when Hanko asks.' : 'You are Tanaka-san, the person who knows this billing system. Keep your phone nearby and use the three responses below.';
 $('mode-label').textContent = mode === 'canned' ? 'Simulated demo' : mode === 'browser' ? 'Browser voice mode' : 'Live phone mode';
 $('mode-description').textContent = mode === 'canned' ? 'Real impact analysis · simulated approval · no call is placed' : 'Mock legacy system · live approval conversation';
+$('call').innerHTML = mode === 'canned' ? 'Start simulated call' : mode === 'browser' ? 'Start browser conversation' : (studio ? 'Call my phone' : 'Call the owner');
+}
+displayMode();
+if (!studio) $('call-title').innerHTML = '<span class="step">04</span>Request owner approval';
 updateLedger();
+calls = ledger.all().some(row => row.change_id === (studio ? rehearsalId : 'CHG-0417')) ? 1 : 0; count();
+if (ledger.all().some(row => !studio || row.change_id === rehearsalId)) guide('ledger', 'A decision is already saved', 'Your previous call and its result are preserved. View the record before starting another demonstration.', 'View saved decision →');
 try { mock = await loadMock(); await renderChange(); gate(); }
 catch (error) { notice('global-error', `Workspace could not load: ${error.message}. Serve the repository over localhost and reload.`); pill('change-pill', 'Unavailable', 'failed'); }
