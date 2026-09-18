@@ -1,0 +1,17 @@
+{
+  "modules": {
+    "billing.cbl": {
+      "owner": "Tanaka-san",
+      "owner_phone": "env:OWNER_PHONE",
+      "backup": "Sato-san",
+      "hours": "09:00-20:00 JST",
+      "channel": "phone",
+      "high_impact": [
+        "tax",
+        "rate",
+        "amount"
+      ],
+      "max_records_without_call": 100
+    }
+  }
+}

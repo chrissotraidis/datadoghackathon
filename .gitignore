@@ -1,0 +1,5 @@
+web/config.js
+PLAN.md
+work/
+__pycache__/
+.DS_Store
