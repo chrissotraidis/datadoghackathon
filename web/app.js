@@ -1,8 +1,8 @@
 import { readPreferences, prefersReducedMotion } from './preferences.js?v=20260918-polish';
 import { loadMock } from './lib/mockdata.js?v=20260918-8';
 import { parseRequest, analyze, checkPolicy } from './lib/impact.js?v=20260918-8';
-import { requestApproval, alreadyCalled } from './lib/call.js?v=20260918-anytime';
-import * as ledger from './lib/ledger.js?v=20260918-8';
+import { requestApproval, alreadyCalled } from './lib/call.js?v=20260918-confirmation2';
+import * as ledger from './lib/ledger.js?v=20260918-confirmation2';
 
 const $ = id => document.getElementById(id);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -23,7 +23,7 @@ function getRehearsal(fresh = false) {
   }
   rehearsalId = id; $('rehearsal-label').textContent = id;
 }
-if (studio) { getRehearsal(); const savedMode = localStorage.getItem('hanko.demo.mode'); if (['phone', 'browser', 'canned'].includes(savedMode)) { mode = savedMode; config.demoMode = mode; } }
+if (studio) { getRehearsal(true); $('request-text').value = ''; const savedMode = localStorage.getItem('hanko.demo.mode'); if (['phone', 'browser', 'canned'].includes(savedMode)) { mode = savedMode; config.demoMode = mode; } }
 $('rehearsal-mode').value = mode;
 let mock, request, impact, policy, busy = false, calls = 0, recognition, guideStep = "request";
 const notice = (id, message = '') => { $(id).textContent = message; $(id).hidden = !message; };
@@ -160,15 +160,15 @@ async function callOwner() {
     const evidenceMatched = Boolean(diff) && snapshot.testsPassed && snapshot.testHash === fullHash;
     const eligibility = decision.decision === 'approved' ? 'APPROVED · RELEASE HELD' : decision.decision === 'conditional' ? 'CONDITIONALLY APPROVED · RELEASE HELD' : decision.decision === 'rejected' ? 'REJECTED' : 'HELD';
     const conditionTask = decision.decision === 'conditional' ? decision.condition_text || 'Clarify and satisfy the owner’s condition before further approval.' : '';
-    const saved = ledger.append({ change_id: snapshot.request.id, proposal_id: snapshot.request.proposal_id || snapshot.request.id, space: studio ? 'demo' : 'workspace', request_text: snapshot.request.text, facts_summary: `${snapshot.impact.paragraph.name}; ${snapshot.impact.jobs.length} jobs; ${snapshot.impact.affected_records} of ${snapshot.impact.total_records} customers; last changed ${snapshot.impact.last_changed.date}. ${snapshot.impact.summary}`, diff_hash: fullHash === 'no-diff' ? fullHash : fullHash.slice(0, 8), decision: decision.decision, condition_text: decision.condition_text, approver: snapshot.policy.owner, approved_at: decision.ended_at, conversation_id: decision.conversation_id, channel: decision.channel, transcript: decision.transcript, rationale_quote: decision.rationale_quote, confirmation_quote: decision.confirmation_quote || '', confirmation_policy: 'explicit_final_yes', started_at: decision.started_at, error: decision.error, diff_sha256: fullHash, diff_snapshot: diff, eligibility, condition_task: conditionTask, test_evidence_matched: evidenceMatched, attempted: decision.attempted });
+    const saved = ledger.append({ change_id: snapshot.request.id, proposal_id: snapshot.request.proposal_id || snapshot.request.id, space: studio ? 'demo' : 'workspace', request_text: snapshot.request.text, facts_summary: `${snapshot.impact.paragraph.name}; ${snapshot.impact.jobs.length} jobs; ${snapshot.impact.affected_records} of ${snapshot.impact.total_records} customers; last changed ${snapshot.impact.last_changed.date}. ${snapshot.impact.summary}`, diff_hash: fullHash === 'no-diff' ? fullHash : fullHash.slice(0, 8), decision: decision.decision, condition_text: decision.condition_text, approver: snapshot.policy.owner, approved_at: decision.ended_at, conversation_id: decision.conversation_id, channel: decision.channel, transcript: decision.transcript, rationale_quote: decision.rationale_quote, confirmation_quote: decision.confirmation_quote || '', confirmation_policy: 'explicit_final_yes', started_at: decision.started_at, error: decision.error, diagnostics: decision.diagnostics, diff_sha256: fullHash, diff_snapshot: diff, eligibility, condition_task: conditionTask, test_evidence_matched: evidenceMatched, attempted: decision.attempted });
     if (!saved) throw new Error('An existing ledger decision was preserved; this result did not replace it');
     updateLedger(); notice('call-error', decision.error);
     $('decision-result').hidden = false;
-    const note = decision.decision === 'conditional' ? `<span class="task-label">Open condition task</span>“${escape(conditionTask)}”` : decision.decision === 'no_answer' ? 'No final yes was confirmed. The change remains on hold.'  : decision.decision === 'rejected' ? escape(decision.condition_text || decision.rationale_quote || 'The owner rejected this change.') : `Approval recorded. Release remains held: the proposed effective date is ${escape(snapshot.request.effective)} and the source has no date guard. ${evidenceMatched ? 'Test evidence matches this exact diff.' : 'Matching test evidence is still required.'}`;
+    const note = decision.decision === 'conditional' ? `<span class="task-label">Open condition task</span>“${escape(conditionTask)}”` : decision.decision === 'no_answer' ? 'The confirmation could not be verified. This is not a rejection; review the transcript below.'  : decision.decision === 'rejected' ? escape(decision.condition_text || decision.rationale_quote || 'The owner rejected this change.') : `Approval recorded. Release remains held: the proposed effective date is ${escape(snapshot.request.effective)} and the source has no date guard. ${evidenceMatched ? 'Test evidence matches this exact diff.' : 'Matching test evidence is still required.'}`;
     $('decision-result').innerHTML = `<div class="decision-card ${decision.decision === 'rejected' ? 'rejected' : ''}"><h3>${escape(eligibility)}${decision.channel === 'canned' ? ' · SIMULATED DECISION' : ''}</h3><p>${note}</p>${decision.confirmation_quote ? `<p class="confirmation-proof">✓ Final confirmation: “${escape(decision.confirmation_quote)}”</p>` : ''}${decision.rationale_quote ? `<p>Rationale: “${escape(decision.rationale_quote)}”</p>` : ''}<p class="mono">${escape(snapshot.request.id)} · diff ${fullHash === 'no-diff' ? 'unavailable' : fullHash.slice(0, 8)}</p></div>`;
     pill('call-pill', 'Decision recorded', 'done');
     $('call-status').textContent = decision.channel === 'canned' ? 'Simulated decision saved to the ledger.' : 'Decision saved to the ledger.';
-    guide('ledger', decision.decision === 'no_answer' ? 'No answer. The change stays held.' : 'The decision is on the record', 'Review the outcome below. The ledger keeps the transcript, condition and exact proposed edit together.', 'View the record →');
+    guide('ledger', decision.decision === 'no_answer' ? 'Approval unconfirmed. Review the conversation.' : 'The decision is on the record', 'Review the outcome below. The ledger keeps the transcript, condition and exact proposed edit together.', 'View the record →');
     advance('decision-result');
   } catch (error) {
     notice('call-error', `Approval could not complete: ${error.message}. The change remains held.`);
@@ -255,6 +255,6 @@ guide('request', 'Start with a change request', 'Load the example, then analyze 
 if (!studio) $('call-title').innerHTML = '<span class="step">04</span>Request owner approval';
 updateLedger();
 calls = ledger.all().some(row => row.change_id === (studio ? rehearsalId : 'CHG-0417')) ? 1 : 0; count();
-if (ledger.all().some(row => !studio || row.change_id === rehearsalId)) guide('ledger', 'A decision is already saved', 'Your previous call and its result are preserved. View the record before starting another demonstration.', 'View saved decision →');
+if (!studio && ledger.all().length) guide('ledger', 'A decision is already saved', 'Your previous call and its result are preserved. View the record before starting another demonstration.', 'View saved decision →');
 try { mock = await loadMock(); await renderChange(); gate(); }
 catch (error) { notice('global-error', `Workspace could not load: ${error.message}. Serve the repository over localhost and reload.`); pill('change-pill', 'Unavailable', 'failed'); }

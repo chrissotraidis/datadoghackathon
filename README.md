@@ -30,7 +30,7 @@ jsDelivr as a fallback. Phone and canned modes do not load that dependency.
 - **Demo Studio** at `/web/?view=demo` guides the hackathon rehearsal. Choose a
   channel, load/analyze the example, review its impact and edit, then use the
   three Tanaka-san responses beside the call button. Only that button dials.
-- **New rehearsal** prepares a new labeled review of the same fixed proposal.
+- **Refresh or New rehearsal** prepares a new labeled review of the same fixed proposal.
   It never calls automatically. Studio receipts use a separate ledger and keep
   earlier rehearsals; the original Workspace receipt stays untouched. Each live
   rehearsal has its own one-call lock. Changing the Studio channel also prepares
@@ -79,7 +79,7 @@ from the browser, so the key is readable by anyone using that local page.
   no approval is inferred. Use localhost or HTTPS for microphone and Web Locks.
 
 The configured agent uses six dynamic variables and three analysis fields:
-`decision`, `condition_text`, `rationale_quote`. It reads every approval back and asks “Do you confirm approval of this change?”
+`decision`, `condition_text`, `rationale_quote`. It reads every approval back and asks “Confirm approval?”
 The app requires a new explicit yes after that question. Greeting yes, an initial
 “approve it,” and ambiguous responses cannot approve. It then ends the conversation. Only exact recognized decisions count;
 missing/ambiguous results remain held. No automated retries or backup calls are
@@ -127,3 +127,8 @@ Open `/web/test-impact.html` for the 48-check impact suite and
 `/web/test-call.html` for a canned call/duplicate-lock check. The latter's
 **Run in configured mode** button initiates a real call when phone mode is set;
 do not use it accidentally. See `VALIDATION.md` for current acceptance evidence.
+
+Call diagnostics retain the latest ten attempts in this browser: call-stage times,
+provider and recorded decisions, interrupted turns and available response-delay
+metrics. Settings record export includes these diagnostics. Incomplete approval
+confirmation is labeled Unconfirmed, not rejected. See [DEMO-REPAIR.md](DEMO-REPAIR.md).

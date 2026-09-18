@@ -80,7 +80,7 @@ async function bounded(promise, ms, message) {
 
 function transcript(rows) {
   return Array.isArray(rows) ? rows.filter(row => row && (row.role === 'agent' || row.role === 'user'))
-    .map(row => ({ role: row.role, text: string(row.message ?? row.text) })).filter(row => row.text) : [];
+    .map(row => ({ role: row.role, text: string(row.message ?? row.text), interrupted: row.interrupted === true, time_in_call_secs: row.time_in_call_secs ?? null })).filter(row => row.text) : [];
 }
 
 export function confirmationQuote(rows) {
@@ -89,7 +89,7 @@ export function confirmationQuote(rows) {
     const text = string(row.message ?? row.text).trim();
     if (!text) continue;
     if (row.role === 'agent') {
-      waiting = /do you confirm (?:your )?approval of this change\?/i.test(text);
+      waiting = /(?:do you confirm (?:your )?approval(?: of this change)?|(?:^|[.!]\s*)confirm approval)\?/i.test(text);
       if (waiting) quote = '';
     } else if (row.role === 'user') {
       if (waiting) {
@@ -115,8 +115,12 @@ function extract(data) {
   if (decision === 'approved' && /\b(not approved|do not approve|don't approve|cannot approve|can't approve|unsure|not sure|i reject)\b/i.test(userText)) decision = 'no_answer';
   const confirmation_quote = confirmationQuote(data.transcript);
   if (['approved', 'conditional'].includes(decision) && !confirmation_quote) decision = 'no_answer';
+  const responseTimes = (data.transcript || []).map(row => row.conversation_turn_metrics?.metrics?.convai_ttf_audio_since_silence?.elapsed_time).filter(value => Number.isFinite(value) && value >= 0);
+  const interrupted = (data.transcript || []).filter(row => row.role === 'agent' && row.interrupted).length;
+  const reason = !userText.trim() ? 'No owner speech was captured.' : !confirmation_quote && ['approved','conditional'].includes(raw) ? 'The voice service heard approval, but a complete confirmation question followed by a clear yes was not captured. This is unconfirmed, not rejected.' : 'No clear final decision was captured. Review the transcript.';
   return { decision, condition_text, rationale_quote, confirmation_quote,
-    error: decision === 'no_answer' ? 'No explicit final yes was confirmed after the decision readback. Change is on hold.' : null };
+    diagnostics: { provider_decision: raw, recorded_decision: decision, max_response_delay_ms: responseTimes.length ? Math.round(Math.max(...responseTimes) * 1000) : null, interrupted_agent_turns: interrupted, confirmation_verified: Boolean(confirmation_quote) },
+    error: decision === 'no_answer' ? reason : null };
 }
 
 async function api(path, body, config, log, timeout = 15000) {
@@ -217,7 +221,8 @@ export async function requestApproval(input = {}) {
   const result = { conversation_id: null, channel: ['phone', 'browser', 'canned'].includes(config?.demoMode) ? config.demoMode : 'canned',
     decision: 'no_answer', attempted: false, condition_text: '', rationale_quote: '', transcript: [],
     started_at: new Date().toISOString(), ended_at: '', error: null };
-  const emit = (status, rows) => { try { onStatus?.(status, rows); } catch { /* UI errors must not cause redial. */ } };
+  const phases = [];
+  const emit = (status, rows) => { if (status !== 'transcript' && phases.at(-1)?.status !== status) phases.push({ status, at: new Date().toISOString() }); try { onStatus?.(status, rows); } catch { /* UI errors must not cause redial. */ } };
   const log = (kind, value) => console.log('[Hanko call]', kind, sanitize(value, config || {}));
   let reserved = false;
   try {
@@ -264,6 +269,11 @@ export async function requestApproval(input = {}) {
     result.ended_at = new Date().toISOString();
     emit('done');
   }
+  result.diagnostics = { ...result.diagnostics, phases: phases.slice(-20) };
+  try {
+    const key = 'hanko.callDiagnostics', previous = JSON.parse(localStorage.getItem(key) || '[]');
+    localStorage.setItem(key, JSON.stringify([{ change_id: request?.id, conversation_id: result.conversation_id, channel: result.channel, attempted: result.attempted, ended_at: result.ended_at, error: result.error, ...result.diagnostics }, ...(Array.isArray(previous) ? previous : [])].slice(0, 10)));
+  } catch { /* Diagnostic storage cannot interrupt a call. */ }
   log('decision', result);
   return result;
 }

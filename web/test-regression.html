@@ -80,6 +80,11 @@ button.onclick = async () => {
     }
     const question = {role:'agent',message:'To confirm: you approve this change. Do you confirm approval of this change? Please say yes or no.'};
     for (const [label, rows, expected] of [
+      ['short confirmation accepts yes',[{role:'agent',message:'You approve this change. Confirm approval?'},{role:'user',message:'Yes.'}],true],
+      ['short question after interruption',[{role:'agent',message:'You approve this ch...',interrupted:true},{role:'user',message:'Yes.'},{role:'agent',message:'Confirm approval?'},{role:'user',message:'Yes, I confirm.'}],true],
+      ['interrupted short question cannot confirm',[{role:'agent',message:'Confirm appro...',interrupted:true},{role:'user',message:'Yes.'}],false],
+      ['corrected no needs a fresh yes',[{role:'agent',message:'Confirm approval?'},{role:'user',message:'No, I approve.'}],false],
+      ['corrected no then fresh confirmation',[{role:'agent',message:'Confirm approval?'},{role:'user',message:'No, I approve.'},{role:'agent',message:'Confirm approval?'},{role:'user',message:'Yes.'}],true],
       ['greeting yes is not final',[{role:'agent',message:'Is now okay?'},{role:'user',message:'Yes.'}],false],
       ['initial approve it is not final',[{role:'user',message:'Approve it.'}],false],
       ['question without answer',[question],false],
