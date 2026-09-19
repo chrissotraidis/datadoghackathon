@@ -12,7 +12,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber)}
 .masthead{display:flex;align-items:center;justify-content:space-between;padding:32px 0 28px;border-bottom:1px solid var(--border)}
 .brand{display:flex;align-items:center;gap:13px;color:var(--text);text-decoration:none;font-size:24px;font-weight:700;letter-spacing:3px;line-height:1.1}
 .brand small{display:block;font-size:11px;font-weight:450;color:var(--muted);letter-spacing:.25px;margin-top:8px}
-.brand-stamp{display:grid;place-items:center;width:44px;height:44px;background:var(--red);border:3px double #f19c88;color:#fff4e8;font-family:serif;font-size:30px;font-weight:400;letter-spacing:0;transform:rotate(-4deg);border-radius:2px}
+.brand-stamp{display:block;width:44px;height:44px;flex-shrink:0;transform:rotate(-4deg)}
 .session-meta{text-align:right;color:var(--muted);font-size:12px}
 .environment{display:block;letter-spacing:1.7px;font:10px var(--mono);color:#696e7b;margin-bottom:9px}
 .session-meta b{color:var(--text);font-family:var(--mono);margin-left:5px}

@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hanko safety regression</title>
+<title>Hango safety regression</title>
 <style>body{font:16px system-ui;background:#101719;color:#edf1e9;max-width:950px;margin:40px auto;padding:20px}button{font:inherit;padding:12px}pre{white-space:pre-wrap;line-height:1.6}.pass{color:#b5d7a0}.fail{color:#ffaaa0}</style>
-<h1>Hanko safety regression</h1>
+<h1>Hango safety regression</h1>
 <p>Isolated in-memory storage and mocked call responses. No config is loaded, no external API is called, and existing ledger records and locks are untouched.</p>
 <button id="run">Run regression checks</button><pre id="output" role="status"></pre>
 <script type="module">
@@ -62,7 +62,7 @@ button.onclick = async () => {
         analysis:{data_collection_results:{decision:{value:raw},condition_text:{value:condition}}}
       }),{status:200,headers:{'Content-Type':'application/json'}});
     };
-    const phone = {demoMode:'phone',agentId:'mock-agent',elevenKey:'mock-key',phoneNumberId:'mock-number',ownerPhone:'+819000000000'};
+    const phone = {demoMode:'phone',agentId:'mock-agent',elevenKey:'mock-key',phoneNumberId:'mock-number',ownerPhone:'+12025550123'};
     let sequence = 0;
     const mockedCall = async extra => requestApproval({...args,config:phone,request:{...request,id:'REG-PHONE-'+sequence++},...extra});
     for (const [value, text, expected] of [['not approved','','no_answer'],['approved','','approved'],['approved','Check rounding','conditional'],['conditional','','no_answer'],['maybe approved','','no_answer'],['rejected','Too risky','rejected']]) {
@@ -70,7 +70,7 @@ button.onclick = async () => {
       if (value === 'approved') conversationTranscript.push({role:'agent',message:'To confirm: you approve this change. Do you confirm approval of this change? Please say yes or no.'},{role:'user',message:'Yes, I confirm.'});
       raw=value;condition=text;const result=await mockedCall();report(`decision ${JSON.stringify(value)} / ${JSON.stringify(text)}`,result.decision===expected&&result.attempted===true);
     }
-    for (const [label, rows] of [['absent transcript',undefined],['empty transcript',[]],['agent-only voicemail',[{role:'agent',message:'Are you there? Chris will follow up.'}]],['blank owner speech',[{role:'user',message:'   '}]]]) {
+    for (const [label, rows] of [['absent transcript',undefined],['empty transcript',[]],['agent-only voicemail',[{role:'agent',message:'Are you there? The requester will follow up.'}]],['blank owner speech',[{role:'user',message:'   '}]]]) {
       conversationTranscript=rows;
       for (const value of ['approved','conditional','rejected']) {
         raw=value;condition=value==='conditional'?'Check rounding':'';

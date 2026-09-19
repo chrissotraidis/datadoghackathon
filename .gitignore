@@ -3,3 +3,14 @@ PLAN.md
 work/
 __pycache__/
 .DS_Store
+
+# Credentials and private demo evidence
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*-records-*.json
+recordings/
+transcripts/
+private/

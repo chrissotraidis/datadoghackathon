@@ -194,7 +194,7 @@ export function checkPolicy(request, impact, policy) {
     && impact?.affected_records > rule.max_records_without_call) tripped.push('records');
   if (!rule) tripped.push('policy unavailable');
   let phone = rule?.owner_phone || '';
-  if (phone.startsWith('env:')) phone = globalThis.window?.HANKO?.ownerPhone || '';
+  if (phone.startsWith('env:')) phone = (globalThis.window?.HANGO || globalThis.window?.HANKO)?.ownerPhone || '';
   return { module, owner: rule?.owner || 'unknown', owner_phone: phone,
     backup: rule?.backup || 'unknown', hours: rule?.hours || 'unknown', channel: 'phone',
     tripped, requires_call: tripped.length > 0 };

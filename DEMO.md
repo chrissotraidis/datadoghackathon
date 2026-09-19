@@ -1,10 +1,10 @@
-# Hanko demo card
+# Hango demo card
 
-**Accountability for AI changes.** Passing tests does not authorize a business change. Hanko connects company policy, a named owner and a decision record tied to the exact proposal.
+**Accountability for AI changes.** Passing tests does not authorize a business change. Hango connects company policy, a named owner and a decision record tied to the exact proposal.
 
 **The scenario:** Tanaka-san maintained this billing system before retiring.
 The company retains him as a technical adviser for critical changes in his area.
-AI prepares the edit; company policy names him as the approver. Hanko captures
+AI prepares the edit; company policy names him as the approver. Hango captures
 his decision and reasoning so the current team keeps the context.
 
 ## Open the right space
@@ -33,7 +33,7 @@ The current live session already has a No answer / HELD receipt from voicemail; 
 
 | Time | Action | Say |
 | --- | --- | --- |
-| 0–7s | Point to Hanko. | “Tanaka has retired. AI prepares the edits; he stays on as an adviser for critical decisions.” |
+| 0–7s | Point to Hango. | “Tanaka has retired. AI prepares the edits; he stays on as an adviser for critical decisions.” |
 | 7–14s | **Use demo request** → **Analyze request**. | “Category seven: tax goes from eight to ten percent next April.” |
 | 14–22s | Point to impact. | “One tax paragraph, three referencing jobs, 1,214 affected customers. Those facts come from the files.” |
 | 22–28s | Show the diff. | “Devin prepared this edit. Codex independently compiled and tested it.” |
@@ -76,9 +76,9 @@ Introduce it once: “The billing data is fictional; this is a live agent conver
 - Open `http://127.0.0.1:8000/web/?view=demo`; confirm mode, proposal hash **3ae78ec9**, matched test evidence and fresh modules. Use typed/demo input unless speech recognition has been rehearsed.
 - Demo calls are available **24/7**, including after 20:00 JST. Use **New rehearsal** for a fresh attempt; previous receipts stay saved.
 - One live attempt consumes its local lock. Reset clears canned evidence only; it preserves live records/locks. If a live attempt exists, show its receipt rather than retrying or clearing storage.
-- All outcomes remain held for release: the fixture has no effective-date guard, and Hanko has no deployment operation. JCL files are counted references, not executed scheduler jobs.
+- All outcomes remain held for release: the fixture has no effective-date guard, and Hango has no deployment operation. JCL files are counted references, not executed scheduler jobs.
 - Gemini and request speech recognition remain optional/unaccepted. The verified summary is a deterministic template. A failed summary needs no stage recovery.
-- Dashboard text rehearsal passed automatic end after a prompt-only fix. This proves agent behavior, not phone transport or human approval. Successful test: `conv_3401m2sz1ma9f0q8p8ja6z601rkn`.
+- Dashboard text rehearsal passed automatic end after a prompt-only fix. This proves agent behavior, not phone transport or human approval.
 - Real phone transport, app polling and safe no-answer recording passed: voicemail said “Please leave a message after the tone,” the agent ended after no response, and the phone-channel transcript/full diff hash were saved as No answer / HELD. No human approved.
 - Extraction returned `conditional` and the verbatim rationale. One run included the rationale sentence inside `condition_text` too. Keep the full transcript visible; do not claim perfect sentence separation.
 - If a call fails, say “The change is held,” show the error, then use the saved receipt/video. No automatic retries or backup-owner calls are implemented.

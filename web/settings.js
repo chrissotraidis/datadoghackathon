@@ -1,6 +1,6 @@
-import { readPreferences, savePreferences, defaults } from './preferences.js?v=20260918-polish';
+import { readPreferences, savePreferences, defaults } from './preferences.js?v=20260919-hango';
 const $ = id => document.getElementById(id);
-const config = window.HANKO || {};
+const config = window.HANGO || window.HANKO || {};
 const notice = (message, error = false) => { $('settings-status').textContent = message; $('settings-status').classList.toggle('error', error); };
 function populate() {
   const prefs = readPreferences();
@@ -64,8 +64,8 @@ updateCounts(); window.addEventListener('storage', updateCounts);
 $('export-records').addEventListener('click', () => {
   const fields = ['change_id','proposal_id','space','request_text','facts_summary','decision','eligibility','condition_text','condition_task','rationale_quote','confirmation_quote','confirmation_policy','approver','approved_at','channel','conversation_id','started_at','diff_hash','diff_sha256','diff_snapshot','test_evidence_matched','transcript','error','diagnostics'];
   const clean = list => list.filter(r => r && typeof r === 'object').map(row => Object.fromEntries(fields.filter(k => Object.hasOwn(row, k)).map(k => [k, row[k]])));
-  const payload = { product: 'Hanko', exported_at: new Date().toISOString(), workspace: clean(rows('hanko.ledger')), studio: clean(rows('hanko.demo.ledger')), call_diagnostics: rows('hanko.callDiagnostics') };
+  const payload = { product: 'Hango', exported_at: new Date().toISOString(), workspace: clean(rows('hanko.ledger')), studio: clean(rows('hanko.demo.ledger')), call_diagnostics: rows('hanko.callDiagnostics') };
   const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
-  const link = document.createElement('a'); link.href = url; link.download = `hanko-records-${new Date().toISOString().slice(0,10)}.json`; link.click();
+  const link = document.createElement('a'); link.href = url; link.download = `hango-records-${new Date().toISOString().slice(0,10)}.json`; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000); notice('Record export downloaded. No credentials are included.');
 });

@@ -1,0 +1,23 @@
+name: Bug report
+description: Report a reproducible problem using synthetic demo data.
+body:
+  - type: markdown
+    attributes:
+      value: "Do not attach API keys, phone numbers, real call transcripts, recordings, or private exports. Use Security → Report a vulnerability for sensitive findings."
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include what you expected and steps to reproduce in simulated mode.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and version
+      placeholder: Chrome, Firefox or Safari version
+  - type: textarea
+    id: checks
+    attributes:
+      label: Relevant checks
+      description: Share test names and pass/fail results, with private details removed.

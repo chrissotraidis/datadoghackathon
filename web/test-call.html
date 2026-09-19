@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hanko — call self-test</title>
+<title>Hango — call self-test</title>
 <style>
   :root { color-scheme: dark; font: 16px system-ui; background: #101719; color: #edf1e9; }
   body { max-width: 860px; margin: 48px auto; padding: 0 24px; }
@@ -17,12 +17,12 @@
 <button id="configured">Run in configured mode</button>
 <p id="result" role="status"></p>
 <pre id="output" aria-live="polite"></pre>
-<p><a href="./">Back to Hanko</a></p>
+<p><a href="./">Back to Hango</a></p>
 <script type="module">
   import { requestApproval, alreadyCalled } from './lib/call.js';
   // Optional local config; a missing file must not block a canned test.
   try { const r = await fetch('./config.js'); if (r.ok) await import('./config.js'); } catch {}
-  document.querySelector('#mode').textContent = `Configured mode: ${window.HANKO?.demoMode || 'not configured'}`;
+  document.querySelector('#mode').textContent = `Configured mode: ${(window.HANGO || window.HANKO)?.demoMode || 'not configured'}`;
   const policy = { owner: 'Tanaka-san', requires_call: true, owner_phone: 'env:OWNER_PHONE', hours: '09:00-20:00 JST', tripped: ['tax', 'records'], channel: 'phone' };
   const request = { id: 'CHG-CALL-SELFTEST', text: 'From April, consumption tax on category 7 goes from 8 to 10 percent.' };
   const impact = { paragraph: { name: 'CALC-TAX' }, definition: { file: 'billing.cbl', line: 17 }, jobs: ['nightly_invoice', 'monthly_close', 'tax_report'], affected_records: 1214, total_records: 3000,
@@ -32,7 +32,7 @@
   const buttons = [...document.querySelectorAll('button')];
   async function run(canned) {
     buttons.forEach(button => { button.disabled = true; }); out.textContent = ''; status.textContent = 'Running…';
-    const config = canned ? { demoMode: 'canned' } : window.HANKO || {};
+    const config = canned ? { demoMode: 'canned' } : window.HANGO || window.HANKO || {};
     const testRequest = { ...request, id: canned ? 'CHG-CANNED-SELFTEST' : request.id };
     // Reset only the synthetic canned fixture. A live test's one-call lock stays intact.
     try {

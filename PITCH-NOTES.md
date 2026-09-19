@@ -1,4 +1,4 @@
-# Hanko: presenter notes
+# Hango: presenter notes
 
 Read-aloud copy: [PITCH.txt](PITCH.txt). Present the existing Demo Studio as the
 visual sequence: impact → proposed edit → policy and named owner → conversation
@@ -33,13 +33,13 @@ correct or that all undocumented knowledge will be captured.
 - **Why involve a person?** The company chooses which decisions it delegates.
   In this example, its policy reserves tax changes for a named owner. Tests
   establish implementation behavior; they do not establish business permission.
-  Hanko does not argue that every AI action needs a phone call.
+  Hango does not argue that every AI action needs a phone call.
 - **Why not hire someone else?** You can. The replacement still needs the
   reasoning behind earlier decisions. Tanaka can advise on critical changes
   while the new team takes over daily work. Each recorded conversation helps
-  the new team inherit context; Hanko complements that handover.
+  the new team inherit context; Hango complements that handover.
 - **What if AI gets better?** Better implementation can support wider delegation.
-  Companies still choose that scope. Hanko's proposed role is to handle decisions
+  Companies still choose that scope. Hango's proposed role is to handle decisions
   outside it and preserve who authorized the exception. The prototype demonstrates
   one fixed billing proposal, not a general autonomous permissions engine.
 - **Is this just an approval workflow?** It is a focused approval workflow for
@@ -85,7 +85,7 @@ question of why a business owner should authorize this change.
   tests already cover a 99-yen invoice. Do not claim this call discovered a new
   bug or proved that a human outperformed the test suite.
 - This MVP keeps local decision records and holds release. It neither merges nor
-  deploys, and it cannot prevent someone deploying outside Hanko. Do not describe
+  deploys, and it cannot prevent someone deploying outside Hango. Do not describe
   it as an enforced production deployment gate, legal transfer of liability,
   tamper-proof audit trail, identity verification, or compliance certification.
 - A production gate is a next step: integrate the decision with the deployment

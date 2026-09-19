@@ -1,134 +1,109 @@
-# Hanko · The stamp for agents
+<p align="center">
+  <img src="web/assets/hango-banner.svg" alt="Hango — Accountability for AI changes" width="860">
+</p>
 
-A local hackathon demonstration: request a legacy billing change, compute its
-impact, inspect a proposed COBOL diff, call its named owner, and keep the spoken
-decision with the exact diff. Conditional approval creates a visible open task
-and keeps the change held. Nothing is merged or deployed by the app.
+<p align="center">
+  <a href="https://github.com/chrissotraidis/datadoghackathon/actions/workflows/checks.yml"><img alt="Repository checks" src="https://github.com/chrissotraidis/datadoghackathon/actions/workflows/checks.yml/badge.svg"></a>
+  <img alt="Experimental prototype" src="https://img.shields.io/badge/status-experimental-e2b561">
+  <img alt="Vanilla JavaScript" src="https://img.shields.io/badge/frontend-vanilla_JavaScript-f7df1e">
+  <img alt="Synthetic COBOL fixture" src="https://img.shields.io/badge/fixture-COBOL-739dcc">
+  <img alt="Human confirmation required" src="https://img.shields.io/badge/approval-human_confirmed-d23b3b">
+</p>
 
-## Run
+**AI can make the change. Who can authorize it?**
 
-From this directory:
+Hango connects an AI-proposed code change to company policy, a named decision-maker,
+and their spoken approval. It shows the impact, asks the owner, and records the
+decision against the exact diff—including any condition that keeps release on hold.
+
+A local hackathon prototype with a synthetic billing system. No real customer
+dataset is included. The app does not merge or deploy code.
+
+<p align="center">
+  <a href="docs/GETTING_STARTED.md">Setup & configuration</a> ·
+  <a href="DEMO.md">Present the demo</a> ·
+  <a href="VALIDATION.md">Validation</a> ·
+  <a href="SECURITY.md">Privacy & security</a>
+</p>
+
+## Try it locally
+
+Requires Python 3 and a modern browser. Simulation needs no account, API key,
+microphone, or phone number.
 
 ```sh
+git clone https://github.com/chrissotraidis/datadoghackathon.git
+cd datadoghackathon
 cp -n web/config.example.js web/config.js
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Open http://127.0.0.1:8000/web/ in Chrome or Brave. Use **Use demo request** →
-**Analyze request** → **Call the owner**. `1` fills the demo; `R` resets simulated
-records when focus is outside a text field. Live decisions and locks survive
-Reset demo. Print opens a separate printable ledger with transcript and diff.
+Open [Demo Studio](http://127.0.0.1:8000/web/?view=demo), choose **Simulated
+conversation**, and follow the next-step guide. The five-second conversation is
+explicitly labeled simulated. Live calling requires your own
+[private configuration](docs/GETTING_STARTED.md#configuration).
 
-No npm, bundler, framework, or application backend. Modules load static files.
-Only browser voice mode dynamically loads the ElevenLabs SDK from esm.sh, with
-jsDelivr as a fallback. Phone and canned modes do not load that dependency.
+## From proposed change to recorded decision
 
-## Two dashboard spaces
-
-- **Workspace** at `/web/` is the product view: requests, source impact, proposed
-  edits, owner approval and saved decisions.
-- **Demo Studio** at `/web/?view=demo` guides the hackathon rehearsal. Choose a
-  channel, load/analyze the example, review its impact and edit, then use the
-  three Tanaka-san responses beside the call button. Only that button dials.
-- **Refresh or New rehearsal** prepares a new labeled review of the same fixed proposal.
-  It never calls automatically. Studio receipts use a separate ledger and keep
-  earlier rehearsals; the original Workspace receipt stays untouched. Each live
-  rehearsal has its own one-call lock. Changing the Studio channel also prepares
-  a new rehearsal and preserves previous receipts.
-- Saved records expand directly to show the transcript, rationale, conversation
-  ID, exact diff and test/hash evidence. Print provides a standalone copy.
-
-## Appearance and preferences
-
-The header theme selector offers System, Light and Dark across all three pages.
-Settings at `/web/settings.html` also controls reduced motion, presenter cue
-visibility and automatic scrolling to completed impact/decision steps.
-Preferences persist in this browser and synchronize across its open tabs.
-Restore display defaults preserves all records and call locks.
-
-Settings can export Workspace and Studio records as JSON. The export selects
-only receipt fields; it does not include local calling credentials. Check
-connection reads agent and imported-number access without placing a call or
-changing the voice configuration. See [VOICE-RESEARCH.md](VOICE-RESEARCH.md)
-for the voice review and preserved baseline.
-
-## Configuration
-
-`web/config.js` defines `window.HANKO` and is gitignored. The local demo key is
-private, expires after one day, has ElevenAgents-only access and a 10,000-credit
-cap. Use a replacement key when it expires; never publish this config or serve
-this checkout on a public interface. This static hackathon app makes requests
-from the browser, so the key is readable by anyone using that local page.
-
-| Field | Purpose |
+| Step | What Hango does |
 | --- | --- |
-| `elevenKey` | ElevenLabs API key for outbound calls and conversation results |
-| `agentId` | Hanko caller agent ID |
-| `phoneNumberId` | Imported Twilio number ID from ElevenLabs, not Twilio SID |
-| `ownerPhone` | Your test mobile in E.164 format, such as `+1…` |
-| `geminiKey` | Optional Google Gemini key; empty uses deterministic summary |
-| `demoMode` | `canned`, `phone`, or `browser` |
+| **Understand the impact** | Traces the COBOL tax calculation to three jobs and 1,214 affected records out of 3,000 synthetic customers. |
+| **Check the authority** | Uses company policy to identify the owner and explain why approval is required. |
+| **Ask and confirm** | Reads the decision back and requires a fresh explicit confirmation. Agreeing to talk is not approval. |
+| **Keep the evidence** | Saves the transcript, condition, rationale, tested diff and SHA-256 in a local decision record. |
 
-- **canned:** a five-second simulated conversation. No network or microphone.
-  The UI and print view explicitly mark it simulated, not human sign-off.
-- **phone:** calls the configured owner via ElevenLabs/Twilio, polls conversation
-  analysis, and stores the real transcript and decision. Requires all four
-  ElevenLabs/phone settings. The demo policy allows calls 24/7, including after 20:00 JST.
-- **browser:** uses your microphone with the same ElevenLabs agent. Conversation
-  analysis still needs the API key; without it, the transcript remains held and
-  no approval is inferred. Use localhost or HTTPS for microphone and Web Locks.
+**Workspace** supports the full review. **Demo Studio** adds presenter cues and
+fresh rehearsals while keeping previous records. **Settings** provides light,
+dark and system themes, reduced motion, connection checks and record export.
 
-The configured agent uses six dynamic variables and three analysis fields:
-`decision`, `condition_text`, `rationale_quote`. It reads every approval back and asks “Confirm approval?”
-The app requires a new explicit yes after that question. Greeting yes, an initial
-“approve it,” and ambiguous responses cannot approve. It then ends the conversation. Only exact recognized decisions count;
-missing/ambiguous results remain held. No automated retries or backup calls are
-implemented. A live attempt consumes the local one-call lock even if it fails.
+## What works today
 
-## What is real
+- Deterministic source analysis and tested before/after COBOL fixtures.
+- Simulated, ElevenLabs phone and browser microphone channels.
+- Explicit confirmation checks, one-call locks, and visible open conditions.
+- Separate Workspace and Studio ledgers with printable evidence.
 
-- Deterministic source/paragraph/reference analysis of the synthetic fixture:
-  CALC-TAX, three jobs, 1,214 of 3,000 fictional customer records, 2009-04-01.
-- Original and proposed programs compile and execute using installed GnuCOBOL.
-  Without `cobc`, the runner explicitly labels Decimal arithmetic simulated.
-- Devin CLI produced the proposed category-7 rate edit on `chg-0417`. Codex ran
-  and verified the tests and committed it because the noninteractive Devin
-  permission mode declined its test/commit shell calls.
-- The proposal diff is exported from that unmerged branch. `test_result.json`
-  includes commit IDs, full diff hash and actual validation output.
-- The ledger snapshots the displayed diff and full SHA-256 before the call.
-  It stores the transcript, exact condition, rationale, owner, time and channel.
+The supported proposal changes category 7 tax from 8% to 10%, with a requested
+effective date of 1 April 2027. The fixture does not implement an effective-date
+guard. Other requests cannot authorize this fixed proposal. Plain approval is
+shown as **APPROVED / NOT DEPLOYED**; conditional approval keeps its task open.
 
-## Demonstration boundaries
+Browser records and locks are local, editable storage. This is not production
+authorization, identity verification, a tamper-proof ledger, or a compliance
+guarantee. Live speech quality still needs a rehearsal in the actual demo setting.
+See the [acceptance evidence and limits](VALIDATION.md).
 
-The only approvable request is category 7, 8% → 10%, effective 2027-04-01.
-Other/defaulted requests may show impact but cannot approve the fixed proposal.
-The COBOL fixture has no effective-date guard. Every decision remains held for
-release, including an unconditional approval. The app does not apply, merge,
-delete, or deploy the proposal.
+## Development
 
-Ledger storage and call locks are local to this browser and origin. They are not
-tamper-proof, cross-device authorization, identity verification, or an audit
-compliance guarantee. A diff hash identifies content; it is not a signature.
-No recorded voice is treated as biometric authentication. The optional Gemini
-summary can fall back to a template and does not determine the impact or policy.
-
-`PLAN.md` is a local copy of the original planning page, ignored because it
-contains account and contact details. Public documentation uses this README.
-
-## Validation
+No application backend, framework or build step. The frontend uses native ES
+modules; Python and optional GnuCOBOL validate the fixture.
 
 ```sh
+python3 scripts/check_public.py
 python3 mock/tests/test_rates.py
-python3 mock/run.py
 ```
 
-Open `/web/test-impact.html` for the 48-check impact suite and
-`/web/test-call.html` for a canned call/duplicate-lock check. The latter's
-**Run in configured mode** button initiates a real call when phone mode is set;
-do not use it accidentally. See `VALIDATION.md` for current acceptance evidence.
+Install GnuCOBOL to test the actual compiled program. Without it, the fixture
+runner labels its Decimal fallback as simulated. Open
+[/web/test-regression.html](http://127.0.0.1:8000/web/test-regression.html) for the
+isolated confirmation and call-flow checks, and
+[/web/test-impact.html](http://127.0.0.1:8000/web/test-impact.html) for source-impact
+checks. Neither suite places a real call.
 
-Call diagnostics retain the latest ten attempts in this browser: call-stage times,
-provider and recorded decisions, interrupted turns and available response-delay
-metrics. Settings record export includes these diagnostics. Incomplete approval
-confirmation is labeled Unconfirmed, not rejected. See [DEMO-REPAIR.md](DEMO-REPAIR.md).
+| Directory | Contents |
+| --- | --- |
+| `web/` | Dashboard, settings, voice integration and browser tests |
+| `mock/` | Synthetic COBOL system, customers, policy and proposal evidence |
+| `agent/` | Voice-agent prompt template |
+| `docs/` | Setup and public-repository guidance |
+| `scripts/` | Repository privacy checks |
+
+## Contribute
+
+Keep changes small and preserve the distinction between simulation, confirmation
+and release. Read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a change.
+Never attach real transcripts, recordings, customer data, phone numbers or keys
+to a public issue. Use the [private reporting guidance](SECURITY.md) for sensitive
+findings.
+
+A project license has not yet been selected. The stamp artwork is maintained as editable SVG source in `web/assets/`.

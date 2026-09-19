@@ -1,4 +1,4 @@
-# Hanko validation · 18 September 2026
+# Hango validation · 18 September 2026
 
 ## Verified locally
 
@@ -45,7 +45,7 @@
 
 ## ElevenLabs setup
 
-- Hanko caller created and published with six dynamic variables, structured
+- Hango caller created and published with six dynamic variables, structured
   extraction fields and end-conversation tool.
 - Restricted one-day demo key saved only in gitignored local config; API read
   checks confirm agent and imported Twilio number accessible.
@@ -83,7 +83,7 @@
 - The user's live call completed and produced an approval, but the old prompt
   accepted “Approve it” before a mandatory readback. Its original receipt remains
   preserved and is labeled as not checked under the final-yes rule.
-- Published agent version `agtvrsn_7401m2t15k92fgbrcae3nhxk1hdy` asks one question
+- The revised published agent asks one question
   per turn, invites a question, reads the decision back, and waits for a fresh
   explicit yes. Silence timeout is 12 seconds; maximum call length is 4 minutes.
 - A live-model text simulation answered a customer-impact question, preserved

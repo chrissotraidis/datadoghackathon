@@ -1,4 +1,4 @@
-# Hanko contracts
+# Hango contracts
 
 All modules are browser ES modules. No backend. Paths are relative to web/.
 Mock files are fetched from ../mock/.
@@ -52,13 +52,13 @@ lib/ledger.js     export function append(row); export function all(); export fun
 app.js            wires REQUEST -> IMPACT -> CHANGE -> CALL -> LEDGER
 
 ## Dynamic variables sent to the ElevenLabs agent (both phone and browser)
-{ owner_name, requester: "Chris", change_id, change_title, facts_short, impact_summary }
+{ owner_name, requester: "the change requester", change_id, change_title, facts_short, impact_summary }
 change_title  = `${request.text}`
 facts_short   = `${impact.paragraph.name} paragraph; ${impact.jobs.length} nightly jobs; ${impact.affected_records} customers; last changed ${impact.last_changed.date}`
 impact_summary = impact.summary
 
 ## Config (web/config.js, gitignored)
-window.HANKO = { elevenKey, agentId, phoneNumberId, ownerPhone, geminiKey, demoMode: "phone" | "browser" | "canned" }
+window.HANGO = { elevenKey, agentId, phoneNumberId, ownerPhone, geminiKey, demoMode: "phone" | "browser" | "canned" }
 
 ## Rules
 - Every module works in demoMode "canned" with no keys.

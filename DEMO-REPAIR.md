@@ -18,7 +18,7 @@ Changes:
 - Turn eagerness is patient, allowing the caller to finish a correction. This
   trades a little turn-taking speed for fewer premature replies. The voice,
   speech model, language model, connection settings and timeouts are unchanged.
-- Hanko recognizes both the short and older complete confirmation questions.
+- Hango recognizes both the short and older complete confirmation questions.
   A new explicit yes is still required; interrupted questions, new conditions,
   and withdrawal remain held. No past receipt was reclassified as approved.
 - Records show Unconfirmed and retain the provider decision, local outcome,

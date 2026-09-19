@@ -1,4 +1,4 @@
-# Hanko execution PRD
+# Hango execution PRD
 
 Status: implementation and evidence snapshot, 18 September 2026. This narrows
 the original Notion plan in `PLAN.md` to the MVP actually built. See
@@ -8,9 +8,9 @@ and [DEMO.md](DEMO.md) for the spoken demo.
 ## Outcome and user
 
 A maintainer proposes a billing change. The person who understands the system
-hears its scope, gives a decision and explains any condition. Hanko keeps that
+hears its scope, gives a decision and explains any condition. Hango keeps that
 judgment with the exact proposed diff. Success is a traceable decision and a
-clear hold state; Hanko does not deploy the change.
+clear hold state; Hango does not deploy the change.
 
 The demonstration uses a fictional billing system and fictional customer data.
 Tanaka-san is the named owner in the scenario; a presenter role-plays that owner.
@@ -39,7 +39,7 @@ These demonstration reviews do not grant production authorization.
 | Record | Local ledger saves request, facts, owner, time, channel, transcript, condition task, rationale, conversation ID, exact diff and hash. Printable copy includes the evidence. | Conditional means HELD with an open condition. Reloading a proposal cannot alter the recorded diff. Reset removes canned records and preserves live evidence/locks. |
 
 All outcomes remain held for release in this MVP. The proposed COBOL code has
-no effective-date guard, and Hanko has no merge or deployment operation.
+no effective-date guard, and Hango has no merge or deployment operation.
 
 ## Evidence and remaining gates
 
@@ -57,9 +57,8 @@ no effective-date guard, and Hanko has no merge or deployment operation.
 | Speech request / Gemini | PENDING, optional | Browser speech recognition and a live Gemini response have not been accepted. Typed input and template summary are the verified defaults. |
 | Show readiness | PENDING | Time one full rehearsal; record a backup; verify the visible mode, proposal hash and retained receipt; submit the hackathon entry separately. |
 
-The successful synthetic text test is
-[conversation conv_3401m2sz1ma9f0q8p8ja6z601rkn](https://elevenlabs.io/app/agents/history/conv_3401m2sz1ma9f0q8p8ja6z601rkn/details),
-using published version `agtvrsn_4301m2sz0thrfq7s24tsa84w3hfc`.
+The successful synthetic text test used the revised published agent.
+Account-specific conversation links and version identifiers are kept private.
 No microphone or outbound phone call was used for that acceptance.
 
 ## Real, simulated, and deliberately absent
