@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hango · Live setup check</title>
+<title>Hanko · Live setup check</title>
 <style>body{background:#101216;color:#eee;font:17px/1.6 system-ui;max-width:850px;margin:50px auto;padding:24px}button{padding:14px 22px;font:inherit}pre{white-space:pre-wrap;border:1px solid #444;padding:24px;border-radius:12px}a{color:#ffa89a}</style>
 <h1>Live setup check</h1><p>Read-only ElevenLabs API checks from this browser. This page does not place a call or access the microphone. No keys or phone numbers are displayed.</p>
-<button id="check">Check live setup</button><pre id="output">Ready.</pre><a href="./">Back to Hango</a>
+<button id="check">Check live setup</button><pre id="output">Ready.</pre><a href="./">Back to Hanko</a>
 <script src="config.js"></script><script type="module">
 const out=document.getElementById('output'), button=document.getElementById('check');
 button.onclick=async()=>{
  button.disabled=true;out.textContent='Checking…';
- const c=window.HANGO||window.HANKO||{},lines=[];
+ const c=window.HANKO||window.HANGO||{},lines=[];
  const report=line=>{lines.push(line);out.textContent=lines.join('\n');};
  try {
   if(!c.elevenKey||!c.agentId||!c.phoneNumberId) throw new Error('Missing API key, agent ID or phone number ID.');
@@ -18,7 +18,7 @@ button.onclick=async()=>{
    return response.json();
   };
   const agent=await get('agents/'+encodeURIComponent(c.agentId));
-  report('PASS: Browser can read Hango agent: '+agent.name);
+  report('PASS: Browser can read Hanko agent: '+agent.name);
   const fields=Object.keys(agent.platform_settings?.data_collection||{});
   report(['decision','condition_text','rationale_quote'].every(k=>fields.includes(k))?'PASS: Three decision extraction fields present.':'FAIL: Decision extraction fields missing.');
   const phone=await get('phone-numbers/'+encodeURIComponent(c.phoneNumberId));

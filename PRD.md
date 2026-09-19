@@ -1,4 +1,4 @@
-# Hango execution PRD
+# Hanko execution PRD
 
 Status: implementation and evidence snapshot, 18 September 2026. This narrows
 the original Notion plan in `PLAN.md` to the MVP actually built. See
@@ -8,9 +8,9 @@ and [DEMO.md](DEMO.md) for the spoken demo.
 ## Outcome and user
 
 A maintainer proposes a billing change. The person who understands the system
-hears its scope, gives a decision and explains any condition. Hango keeps that
+hears its scope, gives a decision and explains any condition. Hanko keeps that
 judgment with the exact proposed diff. Success is a traceable decision and a
-clear hold state; Hango does not deploy the change.
+clear hold state; Hanko does not deploy the change.
 
 The demonstration uses a fictional billing system and fictional customer data.
 Tanaka-san is the named owner in the scenario; a presenter role-plays that owner.
@@ -39,7 +39,7 @@ These demonstration reviews do not grant production authorization.
 | Record | Local ledger saves request, facts, owner, time, channel, transcript, condition task, rationale, conversation ID, exact diff and hash. Printable copy includes the evidence. | Conditional means HELD with an open condition. Reloading a proposal cannot alter the recorded diff. Reset removes canned records and preserves live evidence/locks. |
 
 All outcomes remain held for release in this MVP. The proposed COBOL code has
-no effective-date guard, and Hango has no merge or deployment operation.
+no effective-date guard, and Hanko has no merge or deployment operation.
 
 ## Evidence and remaining gates
 

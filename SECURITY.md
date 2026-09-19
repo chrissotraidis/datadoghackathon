@@ -1,6 +1,6 @@
 # Security and privacy
 
-Hango is an experimental local demo. Run it on `127.0.0.1`, not a public network
+Hanko is an experimental local demo. Run it on `127.0.0.1`, not a public network
 interface. Browser calling uses a local API key that anyone with access to the
 page can read; this architecture is not suitable for a public live-call deployment.
 

@@ -1,4 +1,4 @@
-window.HANGO = {
+window.HANKO = {
   elevenKey: "",
   agentId: "",
   phoneNumberId: "",

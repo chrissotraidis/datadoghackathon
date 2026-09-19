@@ -201,7 +201,7 @@ async function browserCall(config, variables, emit, result, log) {
 async function canned(request, emit, result) {
   result.attempted = true;
   const lines = [
-    { role: 'agent', text: 'This is Hango calling about the billing change. Do you approve it?' },
+    { role: 'agent', text: 'This is Hanko calling about the billing change. Do you approve it?' },
     { role: 'user', text: 'Approved, but check the rounding on invoices under 100 yen.' },
     { role: 'user', text: 'Small invoices always caused trouble in 2009.' },
     { role: 'agent', text: 'To confirm: you approve with the condition to check rounding on invoices under 100 yen. Do you confirm approval of this change? Please say yes or no.' },
@@ -224,7 +224,7 @@ export async function requestApproval(input = {}) {
     started_at: new Date().toISOString(), ended_at: '', error: null };
   const phases = [];
   const emit = (status, rows) => { if (status !== 'transcript' && phases.at(-1)?.status !== status) phases.push({ status, at: new Date().toISOString() }); try { onStatus?.(status, rows); } catch { /* UI errors must not cause redial. */ } };
-  const log = (kind, value) => console.log('[Hango call]', kind, sanitize(value, config || {}));
+  const log = (kind, value) => console.log('[Hanko call]', kind, sanitize(value, config || {}));
   let reserved = false;
   try {
     emit('policy');

@@ -17,7 +17,7 @@ He's now retired, but stays on as a technical adviser.
 AI takes on the code changes.
 But the current team doesn't have all the history behind them.
 
-Hango brings Tanaka in when company policy flags
+Hanko brings Tanaka in when company policy flags
 a critical change in his area,
 and records his decision for the team.
 
@@ -32,7 +32,7 @@ Devin prepared this edit ahead of the demo.
 Codex independently compiled and tested it.
 Our policy names Tanaka as the approver for tax changes.
 
-Hango calls him through ElevenLabs. I'll play Tanaka.
+Hanko calls him through ElevenLabs. I'll play Tanaka.
 
 
 [START THE CALL — STOP NARRATING AND LET THE AGENT SPEAK]
@@ -59,7 +59,7 @@ Yes, I confirm approval with that condition.
 Tanaka didn't have to write the code or return to daily maintenance.
 He gave a decision, a condition, and the reason behind it.
 
-Hango keeps those with the exact change.
+Hanko keeps those with the exact change.
 The condition becomes a task, and release stays held.
 
 Experienced developers can step back.

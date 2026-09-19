@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-labelledby="title desc">
-  <title id="title">Hango — Accountability for AI changes</title>
-  <desc id="desc">A vermilion decision stamp beside the Hango wordmark. Company policy. Named owner. Decision on record.</desc>
+  <title id="title">Hanko — Accountability for AI changes</title>
+  <desc id="desc">A vermilion decision stamp beside the Hanko wordmark. Company policy. Named owner. Decision on record.</desc>
   <rect width="1200" height="400" rx="16" fill="#0f1115"/>
   <path d="M72 318H1128" stroke="#30333b"/>
   <g transform="translate(78 76) rotate(-4 80 80)">
@@ -8,7 +8,7 @@
     <rect x="7" y="7" width="146" height="146" rx="3" fill="none" stroke="#f3b2a0" stroke-width="3"/>
     <text x="80" y="120" text-anchor="middle" font-family="serif" font-size="116" fill="#fff4e8">判</text>
   </g>
-  <text x="286" y="154" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700" letter-spacing="12" fill="#edece7">HANGO</text>
+  <text x="286" y="154" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700" letter-spacing="12" fill="#edece7">HANKO</text>
   <text x="290" y="211" font-family="Arial, Helvetica, sans-serif" font-size="29" fill="#b4b7c0">Accountability for AI changes</text>
   <text x="78" y="357" font-family="Arial, Helvetica, sans-serif" font-size="18" letter-spacing="1" fill="#b4b7c0">Company policy. Named owner. Decision on record.</text>
   <text x="1127" y="357" text-anchor="end" font-family="monospace" font-size="14" letter-spacing="2" fill="#e2927e">HUMAN CONFIRMED</text>

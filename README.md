@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="web/assets/hango-banner.svg" alt="Hango — Accountability for AI changes" width="860">
+  <img src="web/assets/hanko-banner.svg" alt="Hanko — Accountability for AI changes" width="860">
 </p>
 
 <p align="center">
@@ -12,7 +12,7 @@
 
 **AI can make the change. Who can authorize it?**
 
-Hango connects an AI-proposed code change to company policy, a named decision-maker,
+Hanko connects an AI-proposed code change to company policy, a named decision-maker,
 and their spoken approval. It shows the impact, asks the owner, and records the
 decision against the exact diff—including any condition that keeps release on hold.
 
@@ -45,7 +45,7 @@ explicitly labeled simulated. Live calling requires your own
 
 ## From proposed change to recorded decision
 
-| Step | What Hango does |
+| Step | What Hanko does |
 | --- | --- |
 | **Understand the impact** | Traces the COBOL tax calculation to three jobs and 1,214 affected records out of 3,000 synthetic customers. |
 | **Check the authority** | Uses company policy to identify the owner and explain why approval is required. |

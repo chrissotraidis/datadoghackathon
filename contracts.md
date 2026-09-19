@@ -1,4 +1,4 @@
-# Hango contracts
+# Hanko contracts
 
 All modules are browser ES modules. No backend. Paths are relative to web/.
 Mock files are fetched from ../mock/.
@@ -58,7 +58,7 @@ facts_short   = `${impact.paragraph.name} paragraph; ${impact.jobs.length} night
 impact_summary = impact.summary
 
 ## Config (web/config.js, gitignored)
-window.HANGO = { elevenKey, agentId, phoneNumberId, ownerPhone, geminiKey, demoMode: "phone" | "browser" | "canned" }
+window.HANKO = { elevenKey, agentId, phoneNumberId, ownerPhone, geminiKey, demoMode: "phone" | "browser" | "canned" }
 
 ## Rules
 - Every module works in demoMode "canned" with no keys.

@@ -1,4 +1,4 @@
-# Hango validation · 18 September 2026
+# Hanko validation · 18 September 2026
 
 ## Verified locally
 
@@ -45,7 +45,7 @@
 
 ## ElevenLabs setup
 
-- Hango caller created and published with six dynamic variables, structured
+- Hanko caller created and published with six dynamic variables, structured
   extraction fields and end-conversation tool.
 - Restricted one-day demo key saved only in gitignored local config; API read
   checks confirm agent and imported Twilio number accessible.

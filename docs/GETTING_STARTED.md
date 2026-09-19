@@ -1,4 +1,4 @@
-# Running Hango locally
+# Running Hanko locally
 
 A local hackathon demonstration: request a legacy billing change, compute its
 impact, inspect a proposed COBOL diff, call its named owner, and keep the spoken
@@ -54,8 +54,7 @@ for the voice review and preserved baseline.
 
 ## Configuration
 
-`web/config.js` defines `window.HANGO` and is gitignored. Existing
-`window.HANKO` configurations are still supported. Use your own restricted,
+`web/config.js` defines `window.HANKO` and is gitignored. Use your own restricted,
 short-lived provider key; never publish this config or serve this checkout on
 a public interface. This static hackathon app makes requests
 from the browser, so the key is readable by anyone using that local page.
@@ -63,7 +62,7 @@ from the browser, so the key is readable by anyone using that local page.
 | Field | Purpose |
 | --- | --- |
 | `elevenKey` | ElevenLabs API key for outbound calls and conversation results |
-| `agentId` | Hango caller agent ID |
+| `agentId` | Hanko caller agent ID |
 | `phoneNumberId` | Imported Twilio number ID from ElevenLabs, not Twilio SID |
 | `ownerPhone` | Your test mobile in E.164 format, such as `+1…` |
 | `geminiKey` | Optional Google Gemini key; empty uses deterministic summary |
@@ -135,10 +134,12 @@ provider and recorded decisions, interrupted turns and available response-delay
 metrics. Settings record export includes these diagnostics. Incomplete approval
 confirmation is labeled Unconfirmed, not rejected. See [DEMO-REPAIR.md](../DEMO-REPAIR.md).
 
-## Branding compatibility
+## Configuration compatibility
 
-Hango keeps the original `hanko.*` browser storage keys and internal theme
-interface so existing receipts, preferences and one-call locks remain intact.
-The local agent prompt is branded Hango. Existing hosted voice agents must be
-updated separately using [agent/prompt.txt](../agent/prompt.txt); pulling source
-does not change a hosted agent.
+Existing `hanko.*` browser storage keys and the internal theme interface stay
+unchanged, preserving receipts, preferences and one-call locks. The briefly
+published `window.HANGO` config spelling is accepted as a fallback; new configs
+should use `window.HANKO` as shown in the example.
+
+Pulling source does not change a hosted voice agent. The prompt template is
+in [agent/prompt.txt](../agent/prompt.txt).

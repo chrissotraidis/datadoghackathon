@@ -1,4 +1,4 @@
-# Contributing to Hango
+# Contributing to Hanko
 
 Keep changes focused and use the existing visual styles. There is no build step
 or package manager for the frontend. Start with the [local setup](docs/GETTING_STARTED.md).
@@ -12,8 +12,7 @@ Before opening a pull request:
    automated tests must never dial a real number.
 4. Explain what changed, how you tested it, and any remaining acceptance limits.
 
-Preserve existing receipts and one-call locks. The original `hanko.*` storage
-keys remain intentional compatibility identifiers after the Hango rebrand.
+Preserve existing receipts and one-call locks. Keep the existing `hanko.*` storage keys intact.
 Never interpret greeting consent as approval or a conditional decision as release.
 
 `chg-0417` is an intentionally unmerged **demo proposal**, not a maintenance

@@ -1,13 +1,13 @@
-import { readPreferences, prefersReducedMotion } from './preferences.js?v=20260919-hango';
-import { loadMock } from './lib/mockdata.js?v=20260919-hango';
-import { parseRequest, analyze, checkPolicy } from './lib/impact.js?v=20260919-hango';
-import { requestApproval, alreadyCalled } from './lib/call.js?v=20260919-hango';
-import * as ledger from './lib/ledger.js?v=20260919-hango';
+import { readPreferences, prefersReducedMotion } from './preferences.js?v=20260919-hanko';
+import { loadMock } from './lib/mockdata.js?v=20260919-hanko';
+import { parseRequest, analyze, checkPolicy } from './lib/impact.js?v=20260919-hanko';
+import { requestApproval, alreadyCalled } from './lib/call.js?v=20260919-hanko';
+import * as ledger from './lib/ledger.js?v=20260919-hanko';
 
 const $ = id => document.getElementById(id);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const DEMO = 'From April, consumption tax on category 7 goes from 8 to 10 percent.';
-const config = { demoMode: 'canned', ...(window.HANGO || window.HANKO || {}) };
+const config = { demoMode: 'canned', ...(window.HANKO || window.HANGO || {}) };
 let mode = ['phone', 'browser', 'canned'].includes(config.demoMode) ? config.demoMode : 'canned';
 config.demoMode = mode;
 const studio = new URLSearchParams(location.search).get('view') === 'demo';
@@ -77,7 +77,7 @@ async function renderChange() {
   const diffHash = await hashDiff(diff);
   mock.evidenceMatched = test?.passed === true && test.diff_sha256 === diffHash;
   pill('change-pill', mock.evidenceMatched ? 'Tests passed · exact diff' : test?.passed === false ? 'Tests failed' : 'Test evidence unmatched', mock.evidenceMatched ? 'done' : 'failed');
-  $('change-content').innerHTML = `<div class="diff-toolbar"><span class="mono">change.diff</span><span>PROPOSED · AWAITING HUMAN REVIEW</span></div><pre class="diff" aria-label="Proposed change diff">${diff.split('\n').map(line => `<span class="diff-line ${line.startsWith('+') ? 'diff-add' : line.startsWith('-') ? 'diff-remove' : /^(?:@@|diff |index )/.test(line) ? 'diff-meta' : ''}">${escape(line)}</span>`).join('')}</pre><p class="change-note">${escape(test?.summary || 'Test evidence has not been supplied.')} ${test?.effective_date_enforced === false ? `Effective ${escape(test.effective_date || '2027-04-01')}; source has no date guard. Release stays held.` : 'No change is deployed by Hango.'}</p>`;
+  $('change-content').innerHTML = `<div class="diff-toolbar"><span class="mono">change.diff</span><span>PROPOSED · AWAITING HUMAN REVIEW</span></div><pre class="diff" aria-label="Proposed change diff">${diff.split('\n').map(line => `<span class="diff-line ${line.startsWith('+') ? 'diff-add' : line.startsWith('-') ? 'diff-remove' : /^(?:@@|diff |index )/.test(line) ? 'diff-meta' : ''}">${escape(line)}</span>`).join('')}</pre><p class="change-note">${escape(test?.summary || 'Test evidence has not been supplied.')} ${test?.effective_date_enforced === false ? `Effective ${escape(test.effective_date || '2027-04-01')}; source has no date guard. Release stays held.` : 'No change is deployed by Hanko.'}</p>`;
 }
 function renderRequest() {
   const percent = value => `${Number((Number(value) * 100).toFixed(8))}%`;
@@ -98,7 +98,7 @@ function renderPolicy() {
 }
 function renderTranscript(lines = []) {
   $('transcript').hidden = !lines.length;
-  $('transcript').innerHTML = lines.map(line => `<div class="utterance ${line.role === 'agent' ? 'agent' : 'user'}"><small>${line.role === 'agent' ? 'Hango' : escape(policy?.owner || 'Owner')}${mode === 'canned' ? ' · simulated' : ''}</small><p>${escape(line.text)}</p></div>`).join('');
+  $('transcript').innerHTML = lines.map(line => `<div class="utterance ${line.role === 'agent' ? 'agent' : 'user'}"><small>${line.role === 'agent' ? 'Hanko' : escape(policy?.owner || 'Owner')}${mode === 'canned' ? ' · simulated' : ''}</small><p>${escape(line.text)}</p></div>`).join('');
   $('transcript').scrollTop = $('transcript').scrollHeight;
 }
 function status(name, data) {
@@ -107,7 +107,7 @@ function status(name, data) {
   const label = labels[name] || 'Approval in progress';
   const stage = name === 'ringing' ? 'dialing' : name === 'done' ? 'processing' : name;
   document.querySelectorAll('[data-call-stage]').forEach(item => item.dataset.callStage === stage ? item.setAttribute('aria-current', 'step') : item.removeAttribute('aria-current'));
-  if (['dialing', 'ringing', 'in_call'].includes(name)) guide('call', mode === 'phone' ? 'Answer your phone as Tanaka-san' : 'Follow the owner script', 'Listen to Hango, give the rounding condition, then confirm the readback. Wait for the recorded decision.', 'Conversation in progress');
+  if (['dialing', 'ringing', 'in_call'].includes(name)) guide('call', mode === 'phone' ? 'Answer your phone as Tanaka-san' : 'Follow the owner script', 'Listen to Hanko, give the rounding condition, then confirm the readback. Wait for the recorded decision.', 'Conversation in progress');
   $('call-status').textContent = label;
   pill('call-pill', label, name === 'done' ? 'done' : 'working');
 }
@@ -196,7 +196,7 @@ function resetDemo() {
     notice('global-error'); $('speech-status').textContent = ''; $('request-text').focus();
   } catch { notice('global-error', 'Demo reset could not clear local storage. Existing call locks remain in effect.'); }
 }
-function fillDemo() { if (!busy) { $('request-text').value = DEMO; invalidate(); guide('request', 'Analyze the example request', 'The request is ready. Hango will compute the impact from the billing files before any call.', 'Analyze request →'); focusStep('request-panel'); $('request-text').focus(); } }
+function fillDemo() { if (!busy) { $('request-text').value = DEMO; invalidate(); guide('request', 'Analyze the example request', 'The request is ready. Hanko will compute the impact from the billing files before any call.', 'Analyze request →'); focusStep('request-panel'); $('request-text').focus(); } }
 $('new-rehearsal').addEventListener('click', () => {
   if (busy) return;
   getRehearsal(true); calls = 0; count(); fillDemo();
@@ -245,7 +245,7 @@ if (Speech) {
 }
 function displayMode() {
 $('rehearsal-mode').value = mode;
-$('role-instructions').textContent = mode === 'canned' ? 'Watch a simulated owner conversation. The cue card below is your script for a live rehearsal; no phone call is placed in this mode.' : mode === 'browser' ? 'You are Tanaka-san. Use your browser microphone and give the three responses below when Hango asks.' : 'You are Tanaka-san, the person who knows this billing system. Keep your phone nearby and use the three responses below.';
+$('role-instructions').textContent = mode === 'canned' ? 'Watch a simulated owner conversation. The cue card below is your script for a live rehearsal; no phone call is placed in this mode.' : mode === 'browser' ? 'You are Tanaka-san. Use your browser microphone and give the three responses below when Hanko asks.' : 'You are Tanaka-san, the person who knows this billing system. Keep your phone nearby and use the three responses below.';
 $('mode-label').textContent = mode === 'canned' ? 'Simulated demo' : mode === 'browser' ? 'Browser voice mode' : 'Live phone mode';
 $('mode-description').textContent = mode === 'canned' ? 'Real impact analysis · simulated approval · no call is placed' : 'Mock legacy system · live approval conversation';
 $('call').innerHTML = mode === 'canned' ? 'Start simulated call' : mode === 'browser' ? 'Start browser conversation' : (studio ? 'Call my phone' : 'Call the owner');
